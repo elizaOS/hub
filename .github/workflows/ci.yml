@@ -60,7 +60,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: services/merge-steward
-        run: npm ci
+        run: npm ci --workspaces=false
 
       - name: Syntax check
         working-directory: services/merge-steward
@@ -72,7 +72,7 @@ jobs:
 
       - name: Production dependency audit
         working-directory: services/merge-steward
-        run: npm audit --omit=dev
+        run: npm audit --workspaces=false --omit=dev
 
       - name: Repository privacy scan
         run: scripts/private-reference-scan.sh
