@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/elizaOS/hub.git"
   },
-  "packageManager": "bun@1.4.0",
+  "packageManager": "bun@1.3.14",
   "workspaces": [
     "services/*"
   ],

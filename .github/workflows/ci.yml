@@ -31,7 +31,7 @@ jobs:
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.4.0
+          bun-version: 1.3.14
 
       - name: Set up OpenTofu
         uses: opentofu/setup-opentofu@v1
