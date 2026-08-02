@@ -5,11 +5,11 @@
   "type": "module",
   "description": "Agent-native merge queue policy engine for Eliza Hub.",
   "license": "MIT",
-  "homepage": "https://github.com/elizaOS/eliza/tree/develop/packages/eliza-hub/services/merge-steward",
+  "homepage": "https://github.com/elizaOS/hub/tree/main/services/merge-steward",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/elizaOS/eliza.git",
-    "directory": "packages/eliza-hub/services/merge-steward"
+    "url": "git+https://github.com/elizaOS/hub.git",
+    "directory": "services/merge-steward"
   },
   "main": "./src/index.js",
   "exports": {

@@ -72,7 +72,7 @@ load_env_file() {
       fi
       for ((index = 0; index < ${#ENV_KEYS[@]}; index++)); do
         if [[ "${ENV_KEYS[$index]}" == "$key" ]]; then
-          ENV_VALUES[$index]="$value"
+          ENV_VALUES[index]="$value"
           continue 2
         fi
       done

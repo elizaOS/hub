@@ -6,9 +6,8 @@ This package contains the open-source Eliza Hub deployment: an Eliza-themed
 Forgejo instance, the Merge Steward agent-native merge queue, Forgejo Actions
 runner configuration, and production deployment/evidence tooling.
 
-Keep the package self-contained. Paths in Compose files, scripts, workflows,
-and operator docs are intentionally relative to `packages/eliza-hub` so the
-directory can also be extracted and used as a standalone repository.
+Keep the repository self-contained. Paths in Compose files, scripts, workflows,
+and operator docs are relative to the repository root.
 
 ## Architecture
 
@@ -16,8 +15,8 @@ directory can also be extracted and used as a standalone repository.
 - `services/merge-steward/`: ESM Node.js API, worker, CLI, migrations, and tests.
 - `deployment/hetzner-staging/`: Compose, Terraform, runner isolation, backups,
   observability, release gates, and operator evidence tooling.
-- `.forgejo/workflows/`: Forgejo Actions workflows for a standalone Eliza Hub
-  repository. They are reference workflows while nested in this monorepo.
+- `.github/workflows/`: GitHub Actions validation for the public repository.
+- `.forgejo/workflows/`: Native workflows when the repository runs on Forgejo.
 - `docs/`: product, identity, runtime, and readiness design documents.
 
 Forgejo owns Git data. Merge Steward owns queue policy and agent coordination.
@@ -26,17 +25,16 @@ execution must remain disabled unless all explicit production gates pass.
 
 ## Commands
 
-Run package-scoped checks from the monorepo root:
+Run checks from the repository root:
 
 ```sh
-bun run --cwd packages/eliza-hub check
-bun run --cwd packages/eliza-hub test
-bun run --cwd packages/eliza-hub validate:privacy
-bun run --cwd packages/eliza-hub validate:infra
+bun run build
+bun run test
+bun run validate:privacy
+bun run validate:infra
 ```
 
-Do not use broad monorepo Turbo, build, typecheck, or test commands to validate
-changes confined to this package.
+Use `bun run validate` for the complete local validation suite.
 
 ## Safety
 

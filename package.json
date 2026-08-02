@@ -5,12 +5,15 @@
   "description": "Agent-native Forgejo deployment, work coordination, and merge stewardship for elizaOS.",
   "type": "module",
   "license": "MIT",
-  "homepage": "https://github.com/elizaOS/eliza/tree/develop/packages/eliza-hub",
+  "homepage": "https://github.com/elizaOS/hub",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/elizaOS/eliza.git",
-    "directory": "packages/eliza-hub"
+    "url": "git+https://github.com/elizaOS/hub.git"
   },
+  "packageManager": "bun@1.4.0",
+  "workspaces": [
+    "services/*"
+  ],
   "engines": {
     "node": ">=24.0.0"
   },
@@ -20,11 +23,12 @@
     "preflight": "node services/merge-steward/src/cli.js preflight",
     "doctor": "node services/merge-steward/src/cli.js doctor",
     "worker": "node services/merge-steward/src/cli.js worker",
+    "build": "bun run check",
     "check": "bun run --cwd services/merge-steward check",
     "test": "bun run --cwd services/merge-steward test",
     "validate:privacy": "./scripts/private-reference-scan.sh",
     "validate:infra": "./deployment/hetzner-staging/scripts/validate-infrastructure.sh",
-    "validate": "bun run check && bun run test && bun run validate:privacy && bun run validate:infra"
+    "validate": "bun run build && bun run test && bun run validate:privacy && bun run validate:infra"
   },
   "dependencies": {
     "jose": "^6.2.3",

@@ -21,7 +21,7 @@ use; a running instance is created only when an operator starts the stack.
 | --- | --- |
 | Forgejo Git hosting, issues, PRs, releases, packages, wiki, and Kanban projects | Available when the Compose stack is running |
 | Eliza dark and light themes | Included and enabled by the local configuration |
-| Package checks and Merge Steward tests | Automated in the package and monorepo CI |
+| Repository checks and Merge Steward tests | Automated in GitHub and Forgejo CI |
 | Forgejo Actions | Enabled; at least one separately registered runner is required to execute jobs |
 | Merge Steward APIs and dry-run queue planning | Implemented and tested |
 | Live agent merges | Disabled until identity, persistence, runner, repository-protection, and private-evidence gates pass |
@@ -33,16 +33,15 @@ service. It can host real repositories locally as soon as the Compose stack is
 started. Production readiness describes the target deployment, not the
 maturity of Forgejo itself.
 
-## Monorepo Quick Start
+## Quick Start
 
-From the root of the `elizaOS/eliza` repository:
+From the repository root:
 
 ```sh
 bun install
-bun run --cwd packages/eliza-hub check
-bun run --cwd packages/eliza-hub test
-docker compose --project-directory packages/eliza-hub \
-  -f packages/eliza-hub/compose.yml up -d
+bun run build
+bun test
+docker compose up -d
 ```
 
 Open `http://127.0.0.1:3000`. The local Compose stack stores runtime data in
@@ -66,10 +65,9 @@ runner; use the isolated runner overlay described below before treating CI as
 available. Merge Steward is optional for ordinary Git hosting and is required
 only for the Eliza-specific agent coordination and merge-queue workflows.
 
-The directory is also portable. After extracting `packages/eliza-hub` into its
-own repository, run `npm ci --prefix services/merge-steward` before the same
-package-local commands. The nested `.forgejo/workflows` files become active
-when this directory is the repository root.
+GitHub Actions validates the standalone repository on pushes and pull requests.
+The `.forgejo/workflows` definitions provide the equivalent native checks when
+the repository is hosted by Eliza Hub itself.
 
 ## Architecture and Readiness
 
