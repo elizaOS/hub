@@ -376,6 +376,10 @@ Recommended v1:
 
 ## Current V0 API
 
+This list is a design-time snapshot and is not maintained route-by-route. The
+authoritative, complete contract is `services/merge-steward/openapi.json`,
+served by the running service at `GET /openapi.json`.
+
 ```text
 GET  /health
 GET  /ready

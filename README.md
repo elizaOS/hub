@@ -40,7 +40,7 @@ From the repository root:
 ```sh
 bun install
 bun run build
-bun test
+bun run test
 docker compose up -d
 ```
 
@@ -82,6 +82,48 @@ private hosted staging deployment. The checked-in source is not itself an
 operated Eliza Cloud service. A production cutover still requires domain, TLS,
 SSO, backups, runner isolation, monitoring, branch-protection evidence, and a
 staged live-merge rollout in the target environment.
+
+## Starter Repositories and Eliza Army
+
+An operated Eliza Hub instance starts by hosting two repositories:
+
+- [`elizaOS/eliza`](https://github.com/elizaOS/eliza) — the elizaOS agent
+  framework, the first pilot repository for Merge Steward coordination.
+- [`lalalune/arklib`](https://github.com/lalalune/arklib) — the second starter
+  repository in the program, hosted on the hub as `elizaOS/arklib` so both
+  program repositories live under one organization.
+
+[Eliza Army](https://eliza.army) ([source](https://github.com/elizaOS/army)) is
+the public contribution front door: it publishes the contributor skill, the
+live work queue, and the contribution ledger for the repositories in this
+program. Teams that want the army contributing to their repository can request
+onboarding by [opening an issue on
+`elizaOS/army`](https://github.com/elizaOS/army/issues/new?template=add-repository.yml).
+
+Locally, the same seeding is one migration call per repository against the
+running Forgejo instance (see `deployment/hetzner-staging/pilot-bootstrap.md`
+for the production path with pull mirroring, webhooks, branch protection, and
+steward policy registration). The migrate endpoint resolves `repo_owner` but
+never creates it, so on a fresh instance first create the owning user or
+organization once per owner — for example as an organization:
+
+```sh
+curl -u ADMIN_USER:ADMIN_PASS -X POST \
+  http://127.0.0.1:3000/api/v1/orgs \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"elizaOS"}'
+```
+
+Then run the migration itself. `repo_owner` is the hub-side organization, and
+`clone_addr` is the upstream source, so a repository can be hosted under a
+different owner than its origin:
+
+```sh
+curl -u ADMIN_USER:ADMIN_PASS -X POST \
+  http://127.0.0.1:3000/api/v1/repos/migrate \
+  -H 'Content-Type: application/json' \
+  -d '{"clone_addr":"https://github.com/lalalune/arklib.git","repo_owner":"elizaOS","repo_name":"arklib","service":"github"}'
+```
 
 ## What This Provides
 

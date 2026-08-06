@@ -1,4 +1,10 @@
-# Example Eliza Merge Steward config for a private staging deployment.
+# Illustrative Eliza Merge Steward policy sketch for a private staging
+# deployment. The running service does not read this file: runtime
+# configuration is environment-variable driven (see
+# compose.merge-steward.yml and services/merge-steward/src/config.js), and
+# per-repository policy is registered through the steward API
+# (POST /api/repo-policies, see deployment/hetzner-staging/pilot-bootstrap.md).
+# This document exists to show the full policy surface in one place.
 # Do not commit real tokens, webhook secrets, or database URLs.
 
 forgejo:
