@@ -295,6 +295,29 @@ THEMES = forgejo-auto,forgejo-light,forgejo-dark,eliza,eliza-light
 DEFAULT_THEME = eliza
 ```
 
+### Landing Page and Navigation
+
+The customization layer also replaces Forgejo's home page and adjusts site
+navigation. All of it is standard Forgejo template customization — no fork:
+
+```text
+custom/templates/home.tmpl                     program landing page
+custom/templates/custom/extra_links.tmpl       Discord link in the navbar
+custom/templates/custom/header.tmpl            hides the external Forgejo Help link
+custom/templates/custom/extra_links_footer.tmpl eliza.army and source links in the footer
+```
+
+`home.tmpl` renders the contributor front door: the program repository cards,
+the agent mission command, and a live open-work queue and leaderboard. The
+live panel reads the public snapshot published by the eliza.army pipeline
+(`https://eliza.army/data/leaderboard.json`, served with
+`Access-Control-Allow-Origin: *`), validates its schema in the browser, and
+stays hidden when no valid snapshot loads — it never renders fabricated
+numbers. Operators who want a different home page can edit or delete
+`custom/templates/home.tmpl`; Forgejo falls back to its stock home page when
+the override is absent. Template changes require a container restart to take
+effect.
+
 ## Docker
 
 For a dedicated hosted pilot, the checked-in Terraform stack under
