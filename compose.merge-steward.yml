@@ -1,4 +1,11 @@
 services:
+  server:
+    environment:
+      # Forgejo blocks webhook deliveries to private addresses by default,
+      # which silently drops deliveries to the compose-internal steward.
+      # Matches templates/forgejo/app.staging.example.ini ([webhook]).
+      FORGEJO__webhook__ALLOWED_HOST_LIST: "private,loopback"
+
   merge-steward:
     build:
       # The Dockerfile copies services/merge-steward/*, .forgejo, and

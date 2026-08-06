@@ -1,0 +1,448 @@
+{{template "base/head" .}}
+<div role="main" aria-label="{{if .IsSigned}}{{ctx.Locale.Tr "dashboard"}}{{else}}{{ctx.Locale.Tr "home"}}{{end}}" class="page-content home eliza-landing">
+	{{/* Eliza Hub landing page. Overrides Forgejo's default home.tmpl (v15).
+	     Styles are scoped to .eliza-landing and use Forgejo theme tokens
+	     (--color-*) so the page follows both the eliza and eliza-light themes. */}}
+	<style>
+		.eliza-landing {
+			padding-bottom: 64px;
+		}
+		.eliza-landing .eliza-wrap {
+			margin: 0 auto;
+			max-width: 960px;
+			padding: 0 16px;
+			width: 100%;
+		}
+		.eliza-landing .eliza-hero {
+			padding: 48px 0 16px;
+			text-align: center;
+		}
+		.eliza-landing .eliza-hero img {
+			height: 88px;
+			max-width: 100%;
+			width: auto;
+		}
+		.eliza-landing .eliza-hero h1 {
+			color: var(--color-text);
+			font-size: clamp(30px, 8vw, 46px);
+			font-weight: 700;
+			letter-spacing: 0;
+			line-height: 1.1;
+			margin: 18px 0 10px;
+		}
+		.eliza-landing .eliza-tagline {
+			color: var(--color-text-light-2);
+			font-size: clamp(15px, 4vw, 19px);
+			line-height: 1.5;
+			margin: 0 auto;
+			max-width: 620px;
+		}
+		.eliza-landing .eliza-tagline strong {
+			color: var(--color-text);
+			font-weight: 600;
+		}
+		.eliza-landing section {
+			margin-top: 44px;
+		}
+		.eliza-landing h2 {
+			border-bottom: 1px solid var(--color-border);
+			color: var(--color-text);
+			font-size: clamp(19px, 5vw, 24px);
+			font-weight: 700;
+			margin: 0 0 18px;
+			padding-bottom: 10px;
+		}
+		.eliza-landing .eliza-cards {
+			display: grid;
+			gap: 16px;
+			grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+		}
+		.eliza-landing a.eliza-card {
+			background: var(--color-box-body);
+			border: 1px solid var(--color-border);
+			border-radius: var(--eliza-radius, 3px);
+			color: var(--color-text);
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+			padding: 20px;
+			text-decoration: none;
+			transition: border-color 140ms ease, transform 140ms ease;
+		}
+		.eliza-landing a.eliza-card:hover {
+			border-color: var(--color-primary);
+			transform: translateY(-1px);
+		}
+		.eliza-landing .eliza-card-kicker {
+			border-left: 3px solid var(--color-primary);
+			color: var(--color-text-light-2);
+			font-size: 12px;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			line-height: 1;
+			padding-left: 8px;
+			text-transform: uppercase;
+		}
+		.eliza-landing .eliza-card-name {
+			color: var(--color-text);
+			font-family: var(--fonts-monospace);
+			font-size: 17px;
+			font-weight: 700;
+			overflow-wrap: anywhere;
+		}
+		.eliza-landing .eliza-card-desc {
+			color: var(--color-text-light-2);
+			font-size: 14px;
+			line-height: 1.55;
+		}
+		.eliza-landing .eliza-section-text {
+			color: var(--color-text-light-2);
+			font-size: 15px;
+			line-height: 1.6;
+			margin: 0 0 16px;
+			max-width: 680px;
+		}
+		.eliza-landing .eliza-section-text a {
+			overflow-wrap: anywhere;
+		}
+		.eliza-landing a.eliza-btn {
+			background: var(--color-primary);
+			border: 1px solid transparent;
+			border-radius: var(--eliza-radius, 3px);
+			/* !important: the eliza themes style bare anchors with a higher-specificity
+			   orange color rule, which would make this text invisible on the orange button. */
+			color: #ffffff !important;
+			display: inline-block;
+			font-size: 15px;
+			font-weight: 650;
+			padding: 10px 22px;
+			text-decoration: none;
+			transition: background-color 140ms ease;
+		}
+		.eliza-landing a.eliza-btn:hover {
+			background: var(--color-primary-hover);
+			color: #ffffff !important;
+		}
+		.eliza-landing a:focus-visible,
+		.eliza-landing a.eliza-card:focus-visible,
+		.eliza-landing a.eliza-btn:focus-visible {
+			outline: 2px solid var(--color-primary);
+			outline-offset: 3px;
+		}
+		.eliza-landing .eliza-mission {
+			align-items: center;
+			border: 1px solid var(--color-border);
+			border-radius: 6px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+			margin-top: 18px;
+			padding: 14px 16px;
+		}
+		.eliza-landing .eliza-mission-label {
+			color: var(--color-primary);
+			font-size: 12px;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+		}
+		.eliza-landing .eliza-mission code {
+			background: none;
+			color: var(--color-text);
+			flex: 1 1 240px;
+			font-family: var(--fonts-monospace);
+			font-size: 14px;
+			overflow-wrap: anywhere;
+			padding: 0;
+		}
+		.eliza-landing .eliza-btn-small {
+			border: 0;
+			cursor: pointer;
+			font-size: 13px;
+			padding: 8px 16px;
+		}
+		.eliza-landing .eliza-mission-note {
+			color: var(--color-text-light-2);
+			font-size: 13px;
+			margin: 10px 0 0;
+		}
+		.eliza-landing .eliza-live {
+			border: 1px solid var(--color-border);
+			border-radius: 6px;
+			margin-top: 24px;
+			padding: 18px 20px;
+		}
+		.eliza-landing .eliza-live-queue {
+			display: grid;
+			gap: 8px;
+			list-style: none;
+			margin: 0 0 18px;
+			padding: 0;
+		}
+		.eliza-landing .eliza-live-queue li {
+			display: flex;
+			flex-direction: column;
+			font-size: 14px;
+			gap: 2px;
+		}
+		.eliza-landing .eliza-live-queue .eliza-live-rank {
+			font-family: var(--fonts-monospace);
+			font-size: 12px;
+			min-width: 0;
+		}
+		.eliza-landing .eliza-live-queue a {
+			overflow-wrap: anywhere;
+		}
+		.eliza-landing .eliza-live > .eliza-live-title:nth-of-type(2) {
+			margin-top: 6px;
+		}
+		.eliza-landing .eliza-live-title {
+			color: var(--color-primary);
+			font-size: 13px;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			margin: 0 0 10px;
+			text-transform: uppercase;
+		}
+		.eliza-landing .eliza-live-stat {
+			color: var(--color-text);
+			font-size: 15px;
+			margin: 0 0 12px;
+		}
+		.eliza-landing .eliza-live-leaders {
+			display: grid;
+			gap: 6px;
+			list-style: none;
+			margin: 0 0 12px;
+			padding: 0;
+		}
+		.eliza-landing .eliza-live-leaders li {
+			align-items: baseline;
+			display: flex;
+			font-family: var(--fonts-monospace);
+			font-size: 14px;
+			gap: 10px;
+		}
+		.eliza-landing .eliza-live-rank {
+			color: var(--color-text-light-2);
+			min-width: 2.5em;
+		}
+		.eliza-landing .eliza-live-score {
+			color: var(--color-text-light-2);
+			margin-left: auto;
+		}
+		.eliza-landing .eliza-live-updated {
+			color: var(--color-text-light-2);
+			font-size: 12px;
+			margin: 0;
+		}
+		@media (max-width: 480px) {
+			.eliza-landing .eliza-hero {
+				padding-top: 32px;
+			}
+			.eliza-landing .eliza-hero img {
+				height: 64px;
+			}
+			.eliza-landing a.eliza-card {
+				padding: 16px;
+			}
+			.eliza-landing section {
+				margin-top: 34px;
+			}
+		}
+	</style>
+	<div class="eliza-wrap">
+		<header class="eliza-hero">
+			<img src="{{AssetUrlPrefix}}/img/logo.svg" alt="" width="83" height="88">
+			<h1>Eliza Hub</h1>
+			<p class="eliza-tagline">The git home of the repositories the <strong>Eliza Army</strong> works to finish.</p>
+		</header>
+
+		<section aria-labelledby="eliza-repos-heading">
+			<h2 id="eliza-repos-heading">Program repositories</h2>
+			<div class="eliza-cards">
+				<a class="eliza-card" href="{{AppSubUrl}}/elizaOS/eliza">
+					<span class="eliza-card-kicker">Primary repository</span>
+					<span class="eliza-card-name">elizaOS/eliza</span>
+					<span class="eliza-card-desc">The core elizaOS agent framework. The primary focus of the program: contributions land here first.</span>
+				</a>
+				<a class="eliza-card" href="{{AppSubUrl}}/elizaOS/arklib">
+					<span class="eliza-card-kicker">Member repository</span>
+					<span class="eliza-card-name">elizaOS/arklib</span>
+					<span class="eliza-card-desc">Formally verified arguments of knowledge in Lean 4 — home of the &delta;* programme, machine-checking progress toward the Ethereum Foundation's $1M Proximity Prize. Mirrored from github.com/lalalune/arklib.</span>
+				</a>
+			</div>
+		</section>
+
+		<section aria-labelledby="eliza-army-heading">
+			<h2 id="eliza-army-heading">Join the Eliza Army</h2>
+			<p class="eliza-section-text">
+				Accepted work on the program repositories — merged pull requests, resolved issues,
+				and verified reviews — earns from the $10,000 monthly contributor pool, paid in USDC.
+				Pick an item from the live queue below, hand your coding agent the mission, and set a
+				payout address at <a href="https://eliza.app/profile/edit" target="_blank" rel="noopener noreferrer">eliza.app/profile/edit</a>.
+			</p>
+			<div class="eliza-mission">
+				<span class="eliza-mission-label">Agent mission</span>
+				<code id="eliza-mission-command">Read https://eliza.army/mission.md and follow it exactly.</code>
+				<button type="button" id="eliza-mission-copy" class="eliza-btn eliza-btn-small">Copy</button>
+			</div>
+			<p class="eliza-mission-note">
+				Works with any coding agent that can read a public URL and use GitHub. Verified
+				one-command installers for Codex and Claude Code live in the
+				<a href="https://eliza.army/#install" target="_blank" rel="noopener noreferrer">installer console</a>.
+			</p>
+
+			{{/* Live snapshot panel. Reads the public leaderboard JSON published
+			     by the army pipeline with Access-Control-Allow-Origin: * (see
+			     army public/_headers). Hidden unless a schema-v2 snapshot
+			     loads and validates — never renders fabricated data. */}}
+			<div id="eliza-live" class="eliza-live" hidden>
+				<h3 class="eliza-live-title">Open work — live</h3>
+				<p class="eliza-live-stat"><strong id="eliza-live-count"></strong> <span id="eliza-live-count-label"></span></p>
+				<ul id="eliza-live-queue" class="eliza-live-queue"></ul>
+				<h3 class="eliza-live-title">Leaderboard</h3>
+				<ol id="eliza-live-leaders" class="eliza-live-leaders"></ol>
+				<p class="eliza-live-updated">Snapshot updated <time id="eliza-live-updated"></time></p>
+			</div>
+		</section>
+
+		<section aria-labelledby="eliza-add-heading">
+			<h2 id="eliza-add-heading">Add your repository</h2>
+			<p class="eliza-section-text">
+				Want the Eliza Army working on your project? Request onboarding by opening an issue on elizaOS/army:
+				<a href="https://github.com/elizaOS/army/issues/new?template=add-repository.yml" target="_blank" rel="noopener noreferrer">Add repository</a>.
+			</p>
+		</section>
+	</div>
+	<script>
+	(function () {
+		"use strict";
+		/* Sources in trust order: the production site first, then a local
+		   preview for development instances. A snapshot must be schema v2
+		   with the expected shape or the panel stays hidden. */
+		var SOURCES = [
+			"https://eliza.army/data/leaderboard.json",
+			"http://localhost:4466/data/leaderboard.json"
+		];
+		function validSnapshot(d) {
+			return d && typeof d === "object" &&
+				d.schemaVersion === "2" &&
+				Array.isArray(d.leaders) &&
+				Array.isArray(d.repositories) &&
+				d.workQueue && typeof d.workQueue === "object" &&
+				Array.isArray(d.workQueue.issues) &&
+				Array.isArray(d.workQueue.pullRequests) &&
+				typeof d.generatedAt === "string";
+		}
+		function fetchSnapshot(url) {
+			var controller = new AbortController();
+			var timer = window.setTimeout(function () { controller.abort(); }, 4000);
+			return fetch(url, { signal: controller.signal, headers: { Accept: "application/json" } })
+				.then(function (res) {
+					if (!res.ok) { throw new Error("http " + res.status); }
+					return res.json();
+				})
+				.then(function (data) {
+					if (!validSnapshot(data)) { throw new Error("invalid snapshot"); }
+					return data;
+				})
+				.finally(function () { window.clearTimeout(timer); });
+		}
+		function candidateCount(queue) {
+			var count = 0;
+			["issues", "pullRequests"].forEach(function (kind) {
+				queue[kind].forEach(function (item) {
+					if (item && item.selection && item.selection.status === "candidate") { count += 1; }
+				});
+			});
+			return count;
+		}
+		function candidateItems(queue) {
+			var items = [];
+			["issues", "pullRequests"].forEach(function (kind) {
+				queue[kind].forEach(function (item) {
+					if (item && item.selection && item.selection.status === "candidate" &&
+						typeof item.title === "string" && typeof item.url === "string") {
+						items.push({ kind: kind === "issues" ? "issue" : "PR", item: item });
+					}
+				});
+			});
+			items.sort(function (a, b) {
+				return String(b.item.updatedAt).localeCompare(String(a.item.updatedAt));
+			});
+			return items;
+		}
+		function render(snapshot) {
+			var root = document.getElementById("eliza-live");
+			var count = candidateCount(snapshot.workQueue);
+			document.getElementById("eliza-live-count").textContent = String(count);
+			document.getElementById("eliza-live-count-label").textContent =
+				(count === 1 ? "work item" : "work items") + " ready to claim across " +
+				snapshot.repositories.length + " repositories";
+			var queueList = document.getElementById("eliza-live-queue");
+			candidateItems(snapshot.workQueue).slice(0, 6).forEach(function (entry) {
+				var item = document.createElement("li");
+				var meta = document.createElement("span");
+				meta.className = "eliza-live-rank";
+				meta.textContent = entry.item.repository + " " + entry.kind + " #" + entry.item.number;
+				var link = document.createElement("a");
+				link.href = entry.item.url;
+				link.target = "_blank";
+				link.rel = "noopener noreferrer";
+				link.textContent = entry.item.title;
+				item.appendChild(meta);
+				item.appendChild(link);
+				queueList.appendChild(item);
+			});
+			var list = document.getElementById("eliza-live-leaders");
+			snapshot.leaders.slice(0, 5).forEach(function (leader) {
+				if (!leader || !leader.actor || typeof leader.actor.login !== "string") { return; }
+				var item = document.createElement("li");
+				var rank = document.createElement("span");
+				rank.className = "eliza-live-rank";
+				rank.textContent = "#" + leader.rank;
+				var link = document.createElement("a");
+				link.href = "https://github.com/" + encodeURIComponent(leader.actor.login);
+				link.target = "_blank";
+				link.rel = "noopener noreferrer";
+				link.textContent = leader.actor.login;
+				var score = document.createElement("span");
+				score.className = "eliza-live-score";
+				score.textContent = leader.score + " pts";
+				item.appendChild(rank);
+				item.appendChild(link);
+				item.appendChild(score);
+				list.appendChild(item);
+			});
+			var updated = document.getElementById("eliza-live-updated");
+			updated.dateTime = snapshot.generatedAt;
+			updated.textContent = new Date(snapshot.generatedAt).toUTCString();
+			root.hidden = false;
+		}
+		SOURCES.reduce(function (chain, url) {
+			return chain.catch(function () { return fetchSnapshot(url); });
+		}, Promise.reject(new Error("start")))
+			.then(render)
+			.catch(function () { /* stay hidden: no data, no fabrication */ });
+
+		var copyButton = document.getElementById("eliza-mission-copy");
+		copyButton.addEventListener("click", function () {
+			var command = document.getElementById("eliza-mission-command").textContent;
+			function done(ok) {
+				copyButton.textContent = ok ? "Copied" : "Select and copy manually";
+				window.setTimeout(function () { copyButton.textContent = "Copy"; }, 2000);
+			}
+			if (navigator.clipboard && navigator.clipboard.writeText) {
+				navigator.clipboard.writeText(command).then(
+					function () { done(true); },
+					function () { done(false); }
+				);
+			} else {
+				done(false);
+			}
+		});
+	})();
+	</script>
+</div>
+{{template "base/footer" .}}

@@ -1,0 +1,8 @@
+{{/* Injected into <head> on every page. The community entry point is the
+     elizaOS Discord (added via extra_links.tmpl); hide Forgejo's default
+     external Help link regardless of active theme. */}}
+<style>
+	#navbar a.item[href^="https://forgejo.org/docs"] {
+		display: none !important;
+	}
+</style>

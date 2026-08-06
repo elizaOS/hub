@@ -33,7 +33,11 @@ ENV PORT=8787
 
 WORKDIR /app
 
-RUN apk add --no-cache git openssh-client
+# /state backs the MERGE_STEWARD_QUEUE_STORE_PATH named volume; it must exist
+# in the image owned by the runtime user so Docker seeds the volume with
+# node-writable ownership instead of root-only.
+RUN apk add --no-cache git openssh-client && \
+    mkdir -p /state && chown node:node /state
 
 COPY --from=verify --chown=node:node /repo/services/merge-steward/package*.json ./
 COPY --from=verify --chown=node:node /repo/services/merge-steward/node_modules ./node_modules

@@ -23,6 +23,9 @@ services:
       FORGEJO__actions__DEFAULT_ACTIONS_URL: "https://data.forgejo.org"
       FORGEJO__ui__THEMES: "forgejo-auto,forgejo-light,forgejo-dark,eliza,eliza-light"
       FORGEJO__ui__DEFAULT_THEME: "eliza"
+      # Large pilot repositories (elizaOS/eliza) exceed the 600s default
+      # migration timeout. Matches templates/forgejo/app.staging.example.ini.
+      FORGEJO__git_0X2E_timeout__MIGRATE: "7200"
     restart: unless-stopped
     networks:
       - forgejo
