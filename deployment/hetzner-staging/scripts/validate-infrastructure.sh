@@ -41,6 +41,11 @@ main() {
   export TF_IN_AUTOMATION=1
 
   log "using $(basename "$terraform_bin")"
+  if [[ "$(basename "$terraform_bin")" != "tofu" ]]; then
+    log "warning: the committed provider lockfile pins registry.opentofu.org sources;"
+    log "warning: 'terraform init -lockfile=readonly' cannot satisfy them. Install OpenTofu"
+    log "warning: (https://opentofu.org) if initialization fails with a lockfile error."
+  fi
   log "checking formatting"
   "$terraform_bin" fmt -check -recursive "$INFRA_DIR"
 
