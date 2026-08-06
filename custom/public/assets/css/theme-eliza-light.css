@@ -343,12 +343,6 @@ html[data-theme="eliza-light"] .page-footer .left-links::before {
   margin-right: 12px;
 }
 
-html[data-theme="eliza-light"] .page-footer .right-links::after {
-  color: var(--eliza-muted);
-  content: "Local POC";
-  margin-left: 12px;
-}
-
 @media (max-width: 767px) {
   html[data-theme="eliza-light"] #navbar-logo::after {
     content: "Eliza";
