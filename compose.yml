@@ -23,6 +23,13 @@ services:
       FORGEJO__actions__DEFAULT_ACTIONS_URL: "https://data.forgejo.org"
       FORGEJO__ui__THEMES: "forgejo-auto,forgejo-light,forgejo-dark,eliza,eliza-light"
       FORGEJO__ui__DEFAULT_THEME: "eliza"
+      # Link previews and search results otherwise describe upstream Forgejo
+      # rather than this instance; og:description is derived from these.
+      # The section is [ui.meta], not [ui] — values under [ui] are silently
+      # ignored and the page keeps serving the upstream defaults.
+      FORGEJO__ui_0X2E_meta__AUTHOR: "Eliza Hub"
+      FORGEJO__ui_0X2E_meta__DESCRIPTION: "An open git forge for agent-built software. Host your repositories, run CI, and let the Eliza Army finish your issues."
+      FORGEJO__ui_0X2E_meta__KEYWORDS: "eliza,elizaos,git,forge,agents,open source"
       # Large pilot repositories (elizaOS/eliza) exceed the 600s default
       # migration timeout. Matches templates/forgejo/app.staging.example.ini.
       FORGEJO__git_0X2E_timeout__MIGRATE: "7200"
