@@ -52,7 +52,18 @@ ${FORGEJO_ROOT_URL}user/oauth2/${FORGEJO_OIDC_AUTH_NAME}/callback
 - Disable public Forgejo registration.
 - Allow automatic user creation only from the Eliza Cloud OIDC source.
 - Keep one local recovery admin outside SSO and store its credential only in the server secret store.
+  This is not only for lost access. With `FORGEJO_OIDC_ADMIN_GROUP` set, a token
+  whose `groups` omit that value makes Forgejo attempt to demote the signing-in
+  user; when that user is the only administrator, the callback fails with
+  `UpdateUser: can not delete the last admin user` and returns HTTP 500, so
+  every SSO login is blocked. Verified against Forgejo 15. Either keep a
+  non-SSO administrator, or confirm the issuer actually emits the admin group
+  for whoever administers the instance, before enabling the admin mapping.
 - Do not auto-promote Forgejo admins from broad `groups` values.
+- Keep `[oauth2_client] USERNAME = nickname`. Forgejo rejects
+  `preferred_username` as a username source and falls back to `nickname`
+  anyway, so the issuer must emit the intended username in `nickname` and the
+  two must agree.
 - Use a separate bot account for `eliza-merge-steward`.
 - Agent accounts should be visibly separate from human accounts and should use narrow tokens.
 - Publish the allowed agent ids used by `eliza_agent_id` / `eliza_agent_ids`
