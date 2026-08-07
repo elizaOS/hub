@@ -320,13 +320,17 @@
 	<script>
 	(function () {
 		"use strict";
-		/* Sources in trust order: the production site first, then a local
-		   preview for development instances. A snapshot must be schema v2
-		   with the expected shape or the panel stays hidden. */
-		var SOURCES = [
-			"https://eliza.army/data/leaderboard.json",
-			"http://localhost:4466/data/leaderboard.json"
-		];
+		/* The published program snapshot. A snapshot must be schema v2 with the
+		   expected shape or the panel stays hidden — never stale or invented
+		   numbers.
+
+		   The local development preview is only consulted when this page is
+		   itself being served from localhost. A public instance must never
+		   probe its visitors' own machines for a dev server. */
+		var SOURCES = ["https://eliza.army/data/leaderboard.json"];
+		if (/^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname)) {
+			SOURCES.push("http://localhost:4466/data/leaderboard.json");
+		}
 		function validSnapshot(d) {
 			return d && typeof d === "object" &&
 				d.schemaVersion === "2" &&
