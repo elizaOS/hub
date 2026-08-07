@@ -8,7 +8,8 @@
 #   1. Postgres for Merge Steward (the JSON store is single-process staging only)
 #   2. Nightly local backups: full Forgejo dumps (3-day window, they are large)
 #      plus small steward database dumps (30-day window)
-#   3. Unattended security upgrades
+#   3. A health watchdog that restarts failed services and can alert
+#   4. Unattended security upgrades
 #
 # It never deletes repository data and can be re-run safely.
 set -euo pipefail
@@ -16,7 +17,7 @@ set -euo pipefail
 TARGET="${1:?usage: harden.sh <server-ssh-target>}"
 SSH=(ssh -o StrictHostKeyChecking=accept-new "$TARGET")
 
-echo "[1/3] Merge Steward on Postgres"
+echo "[1/4] Merge Steward on Postgres"
 "${SSH[@]}" bash -s <<'REMOTE'
 set -euo pipefail
 cd /opt/eliza-hub
@@ -70,7 +71,7 @@ done
 "${COMPOSE[@]}" up -d
 REMOTE
 
-echo "[2/3] Nightly backups (Forgejo dumps 3 days, steward database 30 days)"
+echo "[2/4] Nightly backups (Forgejo dumps 3 days, steward database 30 days)"
 "${SSH[@]}" bash -s <<'REMOTE'
 set -euo pipefail
 install -d -m 700 /var/backups/eliza-hub
@@ -124,7 +125,94 @@ systemctl daemon-reload
 systemctl enable --now eliza-hub-backup.timer >/dev/null
 REMOTE
 
-echo "[3/3] Unattended security upgrades"
+echo "[3/4] Health watchdog"
+"${SSH[@]}" bash -s <<'REMOTE'
+set -euo pipefail
+cat > /usr/local/bin/eliza-hub-healthcheck <<'SCRIPT'
+#!/usr/bin/env bash
+# Single-node health watchdog. Checks each surface, restarts a container that
+# is failing its check, and reports. Set ELIZA_HUB_ALERT_WEBHOOK in
+# /etc/default/eliza-hub to receive alerts (any endpoint accepting a JSON
+# {"content": "..."} body, which covers Discord and Slack-compatible hooks).
+set -uo pipefail
+[ -f /etc/default/eliza-hub ] && . /etc/default/eliza-hub
+
+problems=()
+
+check() {
+  local name="$1" container="$2" probe="$3"
+  if eval "$probe" >/dev/null 2>&1; then
+    return 0
+  fi
+  problems+=("$name")
+  logger -t eliza-hub-health "unhealthy: $name — restarting $container"
+  docker restart "$container" >/dev/null 2>&1 || true
+  sleep 10
+  if eval "$probe" >/dev/null 2>&1; then
+    logger -t eliza-hub-health "recovered: $name"
+    return 0
+  fi
+  logger -t eliza-hub-health "STILL UNHEALTHY after restart: $name"
+  return 1
+}
+
+unrecovered=()
+check forgejo eliza-forgejo-local \
+  'curl -fsS -m 10 http://127.0.0.1:3000/api/healthz' || unrecovered+=("forgejo")
+# docker ps -a, not docker ps: a stopped container is exactly the failure this
+# watchdog exists to catch, and listing only running ones would skip it.
+if docker ps -a --format '{{.Names}}' | grep -q '^eliza-hub-merge-steward-1$'; then
+  check merge-steward eliza-hub-merge-steward-1 \
+    'curl -fsS -m 10 http://127.0.0.1:8787/health' || unrecovered+=("merge-steward")
+fi
+if docker ps -a --format '{{.Names}}' | grep -q '^eliza-hub-steward-db-1$'; then
+  check steward-db eliza-hub-steward-db-1 \
+    'docker exec eliza-hub-steward-db-1 pg_isready -U steward' || unrecovered+=("steward-db")
+fi
+
+# Disk is the other thing that silently kills a forge: repositories and
+# backups both grow without asking.
+usage="$(df --output=pcent / | tail -1 | tr -dc '0-9')"
+if [ "${usage:-0}" -ge 85 ]; then
+  unrecovered+=("disk ${usage}% full")
+  logger -t eliza-hub-health "disk usage ${usage}%"
+fi
+
+if [ "${#unrecovered[@]}" -gt 0 ] && [ -n "${ELIZA_HUB_ALERT_WEBHOOK:-}" ]; then
+  msg="Eliza Hub on $(hostname): ${unrecovered[*]}"
+  curl -fsS -m 10 -X POST "$ELIZA_HUB_ALERT_WEBHOOK" \
+    -H 'Content-Type: application/json' \
+    --data "$(printf '{"content":"%s"}' "$msg")" >/dev/null 2>&1 || true
+fi
+
+[ "${#unrecovered[@]}" -eq 0 ]
+SCRIPT
+chmod 700 /usr/local/bin/eliza-hub-healthcheck
+[ -f /etc/default/eliza-hub ] || printf '# ELIZA_HUB_ALERT_WEBHOOK=https://...\n' > /etc/default/eliza-hub
+
+cat > /etc/systemd/system/eliza-hub-health.service <<'UNIT'
+[Unit]
+Description=Eliza Hub health watchdog
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/eliza-hub-healthcheck
+UNIT
+
+cat > /etc/systemd/system/eliza-hub-health.timer <<'UNIT'
+[Unit]
+Description=Run the Eliza Hub health watchdog every five minutes
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+[Install]
+WantedBy=timers.target
+UNIT
+
+systemctl daemon-reload
+systemctl enable --now eliza-hub-health.timer >/dev/null
+REMOTE
+
+echo "[4/4] Unattended security upgrades"
 "${SSH[@]}" bash -s <<'REMOTE'
 set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
@@ -134,4 +222,6 @@ REMOTE
 
 echo
 echo "Status:"
-"${SSH[@]}" 'docker ps --format "  {{.Names}}: {{.Status}}"; systemctl is-active eliza-hub-backup.timer | sed "s/^/  backup timer: /"'
+"${SSH[@]}" 'docker ps --format "  {{.Names}}: {{.Status}}"
+  printf "  backup timer: %s\n" "$(systemctl is-active eliza-hub-backup.timer)"
+  printf "  health timer: %s\n" "$(systemctl is-active eliza-hub-health.timer)"'
