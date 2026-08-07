@@ -23,11 +23,22 @@ services:
     networks: [runner]
     volumes:
       - runner-docker-data:/var/lib/docker
+    healthcheck:
+      test: ["CMD", "docker", "-H", "tcp://127.0.0.1:2375", "info"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
 
   runner:
     image: data.forgejo.org/forgejo/runner:12
     restart: unless-stopped
-    depends_on: [runner-docker]
+    depends_on:
+      # Waiting for the container to start is not enough: dockerd takes seconds
+      # to listen, and a runner that starts first fails every job it claims in
+      # that window.
+      runner-docker:
+        condition: service_healthy
     environment:
       DOCKER_HOST: tcp://runner-docker:2375
       # Consumed by the entrypoint below on first registration only.
@@ -54,8 +65,11 @@ services:
         exec forgejo-runner daemon
 
 networks:
+  # Not marked internal: the job dockerd must reach image registries, and jobs
+  # themselves need package registries. Inbound exposure is prevented by
+  # publishing no ports, not by cutting egress. Per-job network restriction for
+  # untrusted pull-request code is a separate control, not this network's job.
   runner:
-    internal: true
   forgejo:
     external: false
 
