@@ -8,8 +8,9 @@
 #   1. Postgres for Merge Steward (the JSON store is single-process staging only)
 #   2. Nightly local backups: full Forgejo dumps (3-day window, they are large)
 #      plus small steward database dumps (30-day window)
-#   3. A health watchdog that restarts failed services and can alert
-#   4. Unattended security upgrades
+#   3. A weekly restore drill, because an unrehearsed backup is a hypothesis
+#   4. A health watchdog that restarts failed services and can alert
+#   5. Unattended security upgrades
 #
 # It never deletes repository data and can be re-run safely.
 set -euo pipefail
@@ -17,7 +18,7 @@ set -euo pipefail
 TARGET="${1:?usage: harden.sh <server-ssh-target>}"
 SSH=(ssh -o StrictHostKeyChecking=accept-new "$TARGET")
 
-echo "[1/4] Merge Steward on Postgres"
+echo "[1/5] Merge Steward on Postgres"
 "${SSH[@]}" bash -s <<'REMOTE'
 set -euo pipefail
 cd /opt/eliza-hub
@@ -71,7 +72,7 @@ done
 "${COMPOSE[@]}" up -d
 REMOTE
 
-echo "[2/4] Nightly backups (Forgejo dumps 3 days, steward database 30 days)"
+echo "[2/5] Nightly backups (Forgejo dumps 3 days, steward database 30 days)"
 "${SSH[@]}" bash -s <<'REMOTE'
 set -euo pipefail
 install -d -m 700 /var/backups/eliza-hub
@@ -125,7 +126,34 @@ systemctl daemon-reload
 systemctl enable --now eliza-hub-backup.timer >/dev/null
 REMOTE
 
-echo "[3/4] Health watchdog"
+echo "[3/5] Weekly restore drill"
+"${SSH[@]}" bash -s <<'REMOTE'
+set -euo pipefail
+# A drill nobody runs is a script, not a guarantee. Schedule it against the
+# checked-out copy so it tracks the repository rather than a stale install.
+cat > /etc/systemd/system/eliza-hub-restore-drill.service <<'UNIT'
+[Unit]
+Description=Eliza Hub restore drill
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/eliza-hub/deployment/single-node/restore-drill.sh --local
+UNIT
+
+cat > /etc/systemd/system/eliza-hub-restore-drill.timer <<'UNIT'
+[Unit]
+Description=Rehearse an Eliza Hub restore weekly
+[Timer]
+OnCalendar=Sun *-*-* 05:00:00 UTC
+Persistent=true
+[Install]
+WantedBy=timers.target
+UNIT
+
+systemctl daemon-reload
+systemctl enable --now eliza-hub-restore-drill.timer >/dev/null
+REMOTE
+
+echo "[4/5] Health watchdog"
 "${SSH[@]}" bash -s <<'REMOTE'
 set -euo pipefail
 cat > /usr/local/bin/eliza-hub-healthcheck <<'SCRIPT'
@@ -212,7 +240,7 @@ systemctl daemon-reload
 systemctl enable --now eliza-hub-health.timer >/dev/null
 REMOTE
 
-echo "[4/4] Unattended security upgrades"
+echo "[5/5] Unattended security upgrades"
 "${SSH[@]}" bash -s <<'REMOTE'
 set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive

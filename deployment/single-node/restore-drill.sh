@@ -2,6 +2,10 @@
 # Prove that a single-node backup can actually be restored.
 #
 #   bash deployment/single-node/restore-drill.sh <server-ssh-target> [archive]
+#   bash deployment/single-node/restore-drill.sh --local [archive]
+#
+# The --local form runs the drill on the machine it is invoked on, which is how
+# harden.sh schedules it weekly. Both forms execute the same checks.
 #
 # A backup nobody has restored is a hypothesis. This drill takes the newest
 # Forgejo dump (or one you name), and without touching the running instance:
@@ -16,11 +20,17 @@
 # never writes to /opt, and never modifies live data.
 set -euo pipefail
 
-TARGET="${1:?usage: restore-drill.sh <server-ssh-target> [archive]}"
+TARGET="${1:?usage: restore-drill.sh <server-ssh-target|--local> [archive]}"
 ARCHIVE="${2:-}"
-SSH=(ssh -o StrictHostKeyChecking=accept-new "$TARGET")
 
-"${SSH[@]}" ARCHIVE="$ARCHIVE" bash -s <<'REMOTE'
+# The drill body is identical either way; only the shell it runs in differs.
+if [ "$TARGET" = "--local" ]; then
+  run_drill() { ARCHIVE="$ARCHIVE" bash -s; }
+else
+  run_drill() { ssh -o StrictHostKeyChecking=accept-new "$TARGET" ARCHIVE="$ARCHIVE" bash -s; }
+fi
+
+run_drill <<'REMOTE'
 set -euo pipefail
 DRILL=/tmp/eliza-hub-restore-drill
 ARCHIVE="${ARCHIVE:-}"
