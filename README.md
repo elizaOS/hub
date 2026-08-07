@@ -48,6 +48,14 @@ Open `http://127.0.0.1:3000`. The local Compose stack stores runtime data in
 ignored paths under this package. Stop it with the same Compose arguments and
 `down`; add `-v` only when you explicitly intend to delete local Forgejo data.
 
+To run a public instance on one server, see
+[`deployment/single-node/`](deployment/single-node/): `deploy.sh` provisions a
+fresh Ubuntu host with Docker, Caddy, and automatic TLS, and `harden.sh` adds
+Postgres-backed Merge Steward, nightly backups, and unattended security
+upgrades. For the multi-host topology with Terraform, isolated Actions runners,
+offsite backups, observability, and production evidence gates, see
+[`deployment/hetzner-staging/`](deployment/hetzner-staging/).
+
 ### Host a Repository Locally
 
 The local configuration allows account registration and does not include a
