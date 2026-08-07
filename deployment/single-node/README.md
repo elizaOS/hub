@@ -63,6 +63,40 @@ A backup on the same disk is not a backup. Add at least one of:
 Neither is a backup until a restore has been rehearsed. `restore-drill.sh` in
 the same directory performs that rehearsal.
 
+## Actions runners
+
+Forgejo Actions is enabled by the base configuration, but jobs queue forever
+until a runner is registered. `compose.runner.yml` in this directory adds one
+with the isolation the rest of this repository assumes: the runner never sees
+the host Docker socket, neither service publishes a port, and jobs run in
+containers rather than on the host.
+
+Register it against an **organisation**, not the whole instance. On a hub with
+open registration, an instance-scoped runner would execute code from any
+repository anyone creates:
+
+```sh
+TOKEN=$(curl -s -u ADMIN:PASS \
+  http://127.0.0.1:3000/api/v1/orgs/YOUR_ORG/actions/runners/registration-token \
+  | sed 's/.*"token":"\([^"]*\)".*/\1/')
+
+cd /opt/eliza-hub
+set -a && source .env.merge-steward.local && set +a
+RUNNER_REGISTRATION_TOKEN="$TOKEN" docker compose \
+  -f compose.yml -f compose.override.yml \
+  -f compose.merge-steward.yml -f compose.postgres.yml \
+  -f deployment/single-node/compose.runner.yml up -d runner-docker runner
+```
+
+Turn Actions off for mirrored repositories whose real CI lives upstream
+(`PATCH /api/v1/repos/OWNER/NAME` with `{"has_actions": false}`). A mirror of a
+large monorepo will otherwise queue its entire upstream pipeline against a
+single node, which fails slowly and tells you nothing.
+
+Runner capacity is the expensive resource on a public instance. Treat untrusted
+pull-request code as hostile: keep the runner org-scoped, size the host for the
+concurrency you intend to allow, and meter it before opening it to everyone.
+
 ## Enabling Merge Steward
 
 Merge Steward is optional; ordinary Git hosting does not need it. To enable

@@ -1,0 +1,64 @@
+# Forgejo Actions runner for a single-node deployment.
+#
+# Isolation rules this file exists to enforce:
+#   - The runner never sees the host Docker socket. It talks to a private
+#     dockerd whose only client is this runner.
+#   - Neither service publishes a port. The dockerd TCP endpoint is reachable
+#     only on the internal compose network.
+#   - Jobs run in containers, never on the host, so no `:host` labels.
+#
+# Register the runner against an ORGANISATION, not the whole instance, so that
+# arbitrary public repositories on a hub with open registration cannot execute
+# code on it. Get a token from
+#   /api/v1/orgs/<org>/actions/runners/registration-token
+# and pass it as RUNNER_REGISTRATION_TOKEN on first start.
+services:
+  runner-docker:
+    image: docker:27-dind
+    restart: unless-stopped
+    privileged: true
+    command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    networks: [runner]
+    volumes:
+      - runner-docker-data:/var/lib/docker
+
+  runner:
+    image: data.forgejo.org/forgejo/runner:12
+    restart: unless-stopped
+    depends_on: [runner-docker]
+    environment:
+      DOCKER_HOST: tcp://runner-docker:2375
+      # Consumed by the entrypoint below on first registration only.
+      RUNNER_REGISTRATION_TOKEN: "${RUNNER_REGISTRATION_TOKEN:?set RUNNER_REGISTRATION_TOKEN}"
+      FORGEJO_INSTANCE_URL: "${FORGEJO_INSTANCE_URL:-http://server:3000}"
+      RUNNER_NAME: "${RUNNER_NAME:-eliza-hub-runner-1}"
+      RUNNER_LABELS: "${RUNNER_LABELS:-docker:docker://node:22-bookworm,ubuntu-latest:docker://node:22-bookworm}"
+    networks: [runner, forgejo]
+    volumes:
+      - runner-data:/data
+    entrypoint:
+      - sh
+      - -c
+      - |
+        set -eu
+        cd /data
+        if [ ! -f .runner ]; then
+          forgejo-runner register --no-interactive \
+            --instance "$${FORGEJO_INSTANCE_URL}" \
+            --token "$${RUNNER_REGISTRATION_TOKEN}" \
+            --name "$${RUNNER_NAME}" \
+            --labels "$${RUNNER_LABELS}"
+        fi
+        exec forgejo-runner daemon
+
+networks:
+  runner:
+    internal: true
+  forgejo:
+    external: false
+
+volumes:
+  runner-docker-data:
+  runner-data:
