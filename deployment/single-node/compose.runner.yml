@@ -55,6 +55,23 @@ services:
       - |
         set -eu
         cd /data
+        # depends_on healthchecks only govern `docker compose up`. After a host
+        # reboot the restart policy starts both containers at once, so the
+        # runner must wait for dockerd itself or it fails jobs claimed during
+        # the gap.
+        # The runner image ships no docker CLI, so probe the daemon's HTTP
+        # ping endpoint directly.
+        PING="http://$${DOCKER_HOST#tcp://}/_ping"
+        i=0
+        until wget -q -O /dev/null -T 3 "$$PING" 2>/dev/null; do
+          i=$$((i + 1))
+          if [ "$$i" -ge 60 ]; then
+            echo "dockerd at $${DOCKER_HOST} did not become ready" >&2
+            exit 1
+          fi
+          sleep 2
+        done
+        echo "dockerd ready"
         if [ ! -f .runner ]; then
           forgejo-runner register --no-interactive \
             --instance "$${FORGEJO_INSTANCE_URL}" \
