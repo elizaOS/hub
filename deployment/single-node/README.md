@@ -60,8 +60,23 @@ A backup on the same disk is not a backup. Add at least one of:
   `/var/backups/eliza-hub` and give it a remote (object storage in a different
   provider or region). `restore-offsite-check.sh` verifies what landed.
 
-Neither is a backup until a restore has been rehearsed. `restore-drill.sh` in
-the same directory performs that rehearsal.
+### Proving the backups work
+
+A backup nobody has restored is a hypothesis. Rehearse it:
+
+```sh
+bash deployment/single-node/restore-drill.sh root@<server-ip>
+```
+
+Without touching the running instance, the drill extracts the smallest
+repository and the database dump from the newest archive, runs `git fsck`,
+clones from the restored repository to confirm a real working tree comes out,
+and checks that the database dump defines the tables carrying accounts,
+repositories, tokens, and webhooks, and contains rows. It exits non-zero on any
+failure, so it can run on a schedule.
+
+Full Forgejo dumps exceed 4 GiB, which ordinary `unzip` cannot read; the drill
+uses a zip64-capable reader. Run it after any change to the backup path.
 
 ## Actions runners
 
