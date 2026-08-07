@@ -45,9 +45,23 @@ Idempotent, and it never deletes repository data.
 
 Backups land in `/var/backups/eliza-hub`: full Forgejo dumps kept for a short
 window because they contain every repository, and small steward database dumps
-kept for a month. Copy them offsite — a backup on the same disk is not a
-backup. `../hetzner-staging/scripts/` contains age-encrypted offsite tooling
-that can be pointed at this directory.
+kept for a month.
+
+### Getting backups off the machine
+
+A backup on the same disk is not a backup. Add at least one of:
+
+- **Provider snapshots.** On Hetzner, `hcloud server enable-backup <server>`
+  keeps rolling full-server images outside the server's disk for 20% of the
+  server price. This is the least-effort protection against losing the host and
+  is worth enabling immediately.
+- **Encrypted offsite copies.** `../hetzner-staging/scripts/backup-offsite.sh`
+  encrypts with age and ships through rclone; point it at
+  `/var/backups/eliza-hub` and give it a remote (object storage in a different
+  provider or region). `restore-offsite-check.sh` verifies what landed.
+
+Neither is a backup until a restore has been rehearsed. `restore-drill.sh` in
+the same directory performs that rehearsal.
 
 ## Enabling Merge Steward
 
