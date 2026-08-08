@@ -18,6 +18,11 @@ services:
       FORGEJO__server__SSH_LISTEN_PORT: "22"
       FORGEJO__security__INSTALL_LOCK: "true"
       FORGEJO__service__DISABLE_REGISTRATION: "false"
+      # New accounts come from the Eliza Cloud OIDC source only; the local
+      # signup form stops creating them. The password form itself stays until
+      # the provider is production-backed, because it is the recovery path if
+      # the issuer is unreachable — see docs/eliza-cloud-sso-plan.md.
+      FORGEJO__service__ALLOW_ONLY_EXTERNAL_REGISTRATION: "true"
       FORGEJO__service__REQUIRE_SIGNIN_VIEW: "false"
       FORGEJO__actions__ENABLED: "true"
       FORGEJO__actions__DEFAULT_ACTIONS_URL: "https://data.forgejo.org"
