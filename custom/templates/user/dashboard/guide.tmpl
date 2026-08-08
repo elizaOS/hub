@@ -1,0 +1,136 @@
+{{/* Overrides Forgejo's empty-feed placeholder. A new account arrives here
+     watching nothing, so the stock version offers three generic explore links
+     and no reason to pick any of them. Point at the funded repositories and
+     the contributor path instead. Styles are scoped to #empty-feed and use
+     Forgejo theme tokens, so both Eliza themes follow. */}}
+<div id="empty-feed" class="tw-p-8">
+	<style>
+		#empty-feed .eliza-empty {
+			margin: 0 auto;
+			max-width: 720px;
+		}
+		#empty-feed .eliza-empty h2 {
+			color: var(--color-text);
+			font-size: clamp(20px, 5vw, 26px);
+			font-weight: 700;
+			margin: 0 0 8px;
+		}
+		#empty-feed .eliza-empty-lede {
+			color: var(--color-text-light-2);
+			font-size: 15px;
+			line-height: 1.6;
+			margin: 0 0 24px;
+		}
+		#empty-feed .eliza-empty-cards {
+			display: grid;
+			gap: 14px;
+			grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+			margin-bottom: 24px;
+			text-align: left;
+		}
+		#empty-feed a.eliza-empty-card {
+			background: var(--color-box-body);
+			border: 1px solid var(--color-border);
+			border-radius: 6px;
+			color: inherit;
+			display: flex;
+			flex-direction: column;
+			gap: 6px;
+			padding: 16px 18px;
+			text-decoration: none;
+		}
+		#empty-feed a.eliza-empty-card:hover {
+			border-color: var(--color-primary);
+		}
+		#empty-feed a.eliza-empty-card:focus-visible {
+			outline: 2px solid var(--color-primary);
+			outline-offset: 2px;
+		}
+		#empty-feed .eliza-empty-kicker {
+			border-left: 2px solid var(--color-primary);
+			color: var(--color-text-light-2);
+			font-size: 11px;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			padding-left: 8px;
+			text-transform: uppercase;
+		}
+		#empty-feed .eliza-empty-name {
+			color: var(--color-text);
+			font-family: var(--fonts-monospace);
+			font-size: 15px;
+			font-weight: 600;
+		}
+		#empty-feed .eliza-empty-desc {
+			color: var(--color-text-light-2);
+			font-size: 13.5px;
+			line-height: 1.5;
+		}
+		#empty-feed .eliza-empty-mission {
+			align-items: center;
+			border: 1px solid var(--color-border);
+			border-radius: 6px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+			padding: 14px 16px;
+			text-align: left;
+		}
+		#empty-feed .eliza-empty-mission code {
+			background: none;
+			color: var(--color-text);
+			flex: 1 1 240px;
+			font-family: var(--fonts-monospace);
+			font-size: 13.5px;
+			overflow-wrap: anywhere;
+			padding: 0;
+		}
+		#empty-feed .eliza-empty-explore {
+			color: var(--color-text-light-2);
+			font-size: 13px;
+			margin-top: 20px;
+		}
+		#empty-feed .eliza-empty-explore a {
+			color: var(--color-primary);
+		}
+	</style>
+
+	<div class="eliza-empty tw-text-center">
+		<h2>Nothing in your feed yet</h2>
+		<p class="eliza-empty-lede">
+			Watch a repository and its activity shows up here. These are the repositories the Eliza Army is funded to finish.
+		</p>
+
+		<div class="eliza-empty-cards">
+			<a class="eliza-empty-card" href="{{AppSubUrl}}/elizaOS/eliza">
+				<span class="eliza-empty-kicker">Verified &middot; Eliza Army funded</span>
+				<span class="eliza-empty-name">elizaOS/eliza</span>
+				<span class="eliza-empty-desc">The elizaOS agent framework.</span>
+			</a>
+			<a class="eliza-empty-card" href="{{AppSubUrl}}/elizaOS/arklib">
+				<span class="eliza-empty-kicker">Verified &middot; Eliza Army funded</span>
+				<span class="eliza-empty-name">elizaOS/arklib</span>
+				<span class="eliza-empty-desc">Formally verified SNARKs in Lean 4 &mdash; working toward the $1M Proximity Prize.</span>
+			</a>
+		</div>
+
+		<div class="eliza-empty-mission">
+			<code>Read https://eliza.army/mission.md and follow it exactly.</code>
+		</div>
+		<p class="eliza-empty-lede tw-mt-2">
+			Hand that to your coding agent. Accepted work on the verified repositories earns from the $10,000 monthly USDC pool.
+		</p>
+
+		<p class="eliza-empty-explore">
+			<a href="{{AppSubUrl}}/explore/repos">Explore repositories</a>
+			{{if not .UsersPageIsDisabled}}
+				<span>&middot;</span>
+				<a href="{{AppSubUrl}}/explore/users">Explore users</a>
+			{{end}}
+			{{if not .OrganizationsPageIsDisabled}}
+				<span>&middot;</span>
+				<a href="{{AppSubUrl}}/explore/organizations">Explore organizations</a>
+			{{end}}
+		</p>
+	</div>
+</div>
