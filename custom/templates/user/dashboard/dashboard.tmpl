@@ -1,64 +1,120 @@
 {{/* Overrides Forgejo's dashboard. Identical to upstream except for the
-     program strip below the navbar: a signed-in user never sees the landing
-     page again, so without this the funded repositories and the contributor
-     path vanish the moment their feed has anything in it. Kept to one compact
-     row so it informs without competing with the feed. Styles are scoped and
-     use theme tokens, so both Eliza themes follow. */}}
+     program panel above the feed: a signed-in user never sees the landing page
+     again, so without this the funded repositories and the contributor path
+     are only visible while the feed happens to be empty. Shown unconditionally
+     with the feed beneath it. Styles are scoped and use theme tokens, so both
+     Eliza themes follow. */}}
 {{template "base/head" .}}
 <div role="main" aria-label="{{.Title}}" class="page-content dashboard feeds">
 	{{template "user/dashboard/navbar" .}}
 	<div class="ui container">
 		<style>
-			.eliza-strip {
-				align-items: center;
+			.eliza-program {
 				border: 1px solid var(--color-border);
 				border-radius: 6px;
+				margin-bottom: 16px;
+				padding: 16px 18px;
+			}
+			.eliza-program-head {
+				align-items: baseline;
 				display: flex;
 				flex-wrap: wrap;
-				gap: 10px 18px;
+				gap: 6px 12px;
 				margin-bottom: 14px;
-				padding: 10px 14px;
 			}
-			.eliza-strip-label {
+			.eliza-program-label {
 				color: var(--color-primary);
 				font-size: 11px;
 				font-weight: 700;
 				letter-spacing: 0.08em;
 				text-transform: uppercase;
 			}
-			.eliza-strip a.eliza-strip-repo {
-				color: var(--color-text);
-				font-family: var(--fonts-monospace);
+			.eliza-program-note {
+				color: var(--color-text-light-2);
 				font-size: 13px;
+			}
+			.eliza-program-note a { color: var(--color-primary); }
+			.eliza-program-cards {
+				display: grid;
+				gap: 12px;
+				grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+				margin-bottom: 12px;
+			}
+			.eliza-program a.eliza-program-card {
+				background: var(--color-box-body);
+				border: 1px solid var(--color-border);
+				border-radius: 5px;
+				color: inherit;
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+				padding: 12px 14px;
 				text-decoration: none;
 			}
-			.eliza-strip a.eliza-strip-repo:hover {
-				color: var(--color-primary);
+			.eliza-program a.eliza-program-card:hover { border-color: var(--color-primary); }
+			.eliza-program a.eliza-program-card:focus-visible {
+				outline: 2px solid var(--color-primary);
+				outline-offset: 2px;
 			}
-			.eliza-strip-sep {
-				color: var(--color-text-light-3);
+			.eliza-program-name {
+				color: var(--color-text);
+				font-family: var(--fonts-monospace);
+				font-size: 14px;
+				font-weight: 600;
 			}
-			.eliza-strip-mission {
+			.eliza-program-desc {
 				color: var(--color-text-light-2);
 				font-size: 12.5px;
-				margin-left: auto;
+				line-height: 1.45;
 			}
-			.eliza-strip-mission a {
+			.eliza-program-mission {
+				align-items: center;
+				border: 1px solid var(--color-border);
+				border-radius: 5px;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px;
+				padding: 10px 12px;
+			}
+			.eliza-program-mission span.k {
 				color: var(--color-primary);
+				font-size: 10.5px;
+				font-weight: 700;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
 			}
-			@media (max-width: 767px) {
-				.eliza-strip-mission { margin-left: 0; }
+			.eliza-program-mission code {
+				background: none;
+				color: var(--color-text);
+				flex: 1 1 220px;
+				font-family: var(--fonts-monospace);
+				font-size: 13px;
+				overflow-wrap: anywhere;
+				padding: 0;
 			}
 		</style>
-		<div class="eliza-strip">
-			<span class="eliza-strip-label">Eliza Army funded</span>
-			<a class="eliza-strip-repo" href="{{AppSubUrl}}/elizaOS/eliza">elizaOS/eliza</a>
-			<span class="eliza-strip-sep">&middot;</span>
-			<a class="eliza-strip-repo" href="{{AppSubUrl}}/elizaOS/arklib">elizaOS/arklib</a>
-			<span class="eliza-strip-mission">
-				Accepted work earns from the $10,000 monthly pool &mdash;
-				<a href="https://eliza.army" target="_blank" rel="noopener noreferrer">how it works</a>
-			</span>
+		<div class="eliza-program">
+			<div class="eliza-program-head">
+				<span class="eliza-program-label">Eliza Army funded</span>
+				<span class="eliza-program-note">
+					Accepted work on these repositories earns from the $10,000 monthly USDC pool &mdash;
+					<a href="https://eliza.army" target="_blank" rel="noopener noreferrer">how it works</a>
+				</span>
+			</div>
+			<div class="eliza-program-cards">
+				<a class="eliza-program-card" href="{{AppSubUrl}}/elizaOS/eliza">
+					<span class="eliza-program-name">elizaOS/eliza</span>
+					<span class="eliza-program-desc">The elizaOS agent framework.</span>
+				</a>
+				<a class="eliza-program-card" href="{{AppSubUrl}}/elizaOS/arklib">
+					<span class="eliza-program-name">elizaOS/arklib</span>
+					<span class="eliza-program-desc">Formally verified SNARKs in Lean 4 &mdash; working toward the $1M Proximity Prize.</span>
+				</a>
+			</div>
+			<div class="eliza-program-mission">
+				<span class="k">Agent mission</span>
+				<code>Read https://eliza.army/mission.md and follow it exactly.</code>
+			</div>
 		</div>
 	</div>
 	<div class="ui container flex-container">
