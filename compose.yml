@@ -23,6 +23,14 @@ services:
       # the provider is production-backed, because it is the recovery path if
       # the issuer is unreachable — see docs/eliza-cloud-sso-plan.md.
       FORGEJO__service__ALLOW_ONLY_EXTERNAL_REGISTRATION: "true"
+      # Without these the OIDC source authenticates but creates no account, so
+      # a first-time sign-in dead-ends. USERNAME must stay `nickname`: Forgejo
+      # rejects `preferred_username` as a username source and silently falls
+      # back to nickname anyway. See docs/eliza-cloud-sso-plan.md.
+      FORGEJO__oauth2_client__ENABLE_AUTO_REGISTRATION: "true"
+      FORGEJO__oauth2_client__REGISTER_EMAIL_CONFIRM: "false"
+      FORGEJO__oauth2_client__USERNAME: "nickname"
+      FORGEJO__oauth2_client__ACCOUNT_LINKING: "login"
       FORGEJO__service__REQUIRE_SIGNIN_VIEW: "false"
       FORGEJO__actions__ENABLED: "true"
       FORGEJO__actions__DEFAULT_ACTIONS_URL: "https://data.forgejo.org"
