@@ -31,6 +31,11 @@ services:
       FORGEJO__oauth2_client__REGISTER_EMAIL_CONFIRM: "false"
       FORGEJO__oauth2_client__USERNAME: "nickname"
       FORGEJO__oauth2_client__ACCOUNT_LINKING: "login"
+      # Eliza Cloud is the only way in: the username/password form is removed
+      # from the sign-in page entirely. Recovery, if the issuer is ever
+      # unreachable, is to set this back to "true" and restart — the local
+      # credential is still valid, only the form is withdrawn.
+      FORGEJO__service__ENABLE_INTERNAL_SIGNIN: "false"
       FORGEJO__service__REQUIRE_SIGNIN_VIEW: "false"
       FORGEJO__actions__ENABLED: "true"
       FORGEJO__actions__DEFAULT_ACTIONS_URL: "https://data.forgejo.org"

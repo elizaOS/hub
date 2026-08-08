@@ -1,0 +1,20 @@
+{{/* Overrides Forgejo's empty-feed placeholder. The funded repositories and
+     the contributor path are shown unconditionally by the dashboard template
+     above this, so this only has to explain the empty feed itself and offer
+     the explore links. */}}
+<div id="empty-feed" class="tw-text-center tw-p-8">
+	{{svg "octicon-inbox" 48 "tw-text-placeholder-text"}}
+	<h2>Nothing in your feed yet</h2>
+	<p class="help">Watch a repository and its activity shows up here.</p>
+	<div>
+		<a href="{{AppSubUrl}}/explore/repos">{{ctx.Locale.Tr "home.explore_repos"}}</a>
+		{{if not .UsersPageIsDisabled}}
+			<span>&middot;</span>
+			<a href="{{AppSubUrl}}/explore/users">{{ctx.Locale.Tr "home.explore_users"}}</a>
+		{{end}}
+		{{if not .OrganizationsPageIsDisabled}}
+			<span>&middot;</span>
+			<a href="{{AppSubUrl}}/explore/organizations">{{ctx.Locale.Tr "home.explore_orgs"}}</a>
+		{{end}}
+	</div>
+</div>
