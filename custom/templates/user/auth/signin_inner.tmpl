@@ -1,0 +1,313 @@
+{{/*
+	Eliza Hub — templates/user/auth/signin_inner.tmpl (drop-in replacement)
+	Deployed at custom/templates/user/auth/signin_inner.tmpl on git.eliza.army
+	Refined-minimal SSO gateway. Internal username/password sign-in is retired here:
+	the single Eliza Cloud provider button is the hero. All CSS is scoped under
+	.eliza-signin so nothing leaks. No external resources (CSP-safe). The href and
+	the provider-name style hook are derived from .OAuth2Providers so nothing breaks
+	if the provider is renamed. Connecting-state interstitial is a synchronous CSS
+	class toggle over pre-rendered nodes, reset on bfcache restore.
+*/}}
+<style>
+	.eliza-signin {
+		box-sizing: border-box;
+		width: 100%;
+		max-width: 440px;
+		margin: 0 auto;
+		padding: 44px 40px 36px;
+		background: var(--color-box-body);
+		border: 1px solid var(--color-border);
+		border-radius: 6px;
+		text-align: center;
+	}
+	.eliza-signin *,
+	.eliza-signin *::before,
+	.eliza-signin *::after { box-sizing: border-box; }
+
+	.eliza-signin .eliza-logo {
+		display: block;
+		width: 44px;
+		height: 44px;
+		margin: 0 auto 22px;
+	}
+
+	.eliza-signin .eliza-eyebrow {
+		margin: 0 0 14px;
+		font-family: var(--fonts-monospace);
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--color-text-light-2);
+	}
+
+	.eliza-signin h1 {
+		margin: 0 0 12px;
+		font-size: 26px;
+		line-height: 1.15;
+		font-weight: 600;
+		letter-spacing: -0.012em;
+		color: var(--color-text);
+	}
+
+	.eliza-signin .eliza-sub {
+		max-width: 36ch;
+		margin: 0 auto 28px;
+		font-size: 14px;
+		line-height: 1.55;
+		color: var(--color-text-light-2);
+	}
+
+	/* Hero provider button — the one place the accent is spent. */
+	.eliza-signin .eliza-btn {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		width: 100%;
+		min-height: 48px;
+		padding: 0 18px;
+		background: var(--color-primary);
+		color: #fff !important;
+		border: 1px solid transparent;
+		border-radius: 4px;
+		font-size: 15px;
+		font-weight: 600;
+		text-decoration: none;
+		cursor: pointer;
+		transition: filter 0.15s ease, transform 0.1s ease;
+	}
+	.eliza-signin .eliza-btn:hover { filter: brightness(1.08); }
+	.eliza-signin .eliza-btn:active { transform: translateY(1px); }
+	.eliza-signin .eliza-btn:focus-visible {
+		outline: 2px solid var(--color-primary);
+		outline-offset: 3px;
+	}
+	.eliza-signin .eliza-btn svg { fill: currentColor; }
+
+	.eliza-signin .eliza-btn__face {
+		display: inline-flex;
+		align-items: center;
+		gap: 9px;
+	}
+	.eliza-signin .eliza-btn__face svg { transition: transform 0.15s ease; }
+	.eliza-signin .eliza-btn:hover .eliza-btn__face svg { transform: translateX(3px); }
+
+	.eliza-signin .eliza-btn__connect {
+		display: none;
+		align-items: center;
+		gap: 10px;
+	}
+
+	/* Connecting state: swap the face for spinner + label, freeze the button. */
+	.eliza-signin .eliza-btn.is-connecting {
+		cursor: default;
+		filter: none;
+		pointer-events: none;
+	}
+	.eliza-signin .eliza-btn.is-connecting .eliza-btn__face { display: none; }
+	.eliza-signin .eliza-btn.is-connecting .eliza-btn__connect { display: inline-flex; }
+
+	.eliza-signin .eliza-spinner {
+		flex: 0 0 auto;
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		border: 2px solid rgba(255, 255, 255, 0.4);
+		border-top-color: #fff;
+		animation: eliza-spin 0.7s linear infinite;
+	}
+	@keyframes eliza-spin { to { transform: rotate(360deg); } }
+
+	/* Crisp, quiet dimming of everything but the button while connecting. */
+	.eliza-signin.is-connecting .eliza-eyebrow,
+	.eliza-signin.is-connecting .eliza-sub,
+	.eliza-signin.is-connecting .eliza-foot { opacity: 0.5; transition: opacity 0.2s ease; }
+
+	.eliza-signin .eliza-note {
+		display: none;
+		margin: 14px 0 0;
+		font-size: 13px;
+		line-height: 1.5;
+		color: var(--color-text);
+	}
+	.eliza-signin.is-stalled .eliza-note { display: block; }
+
+	.eliza-signin .eliza-foot {
+		margin-top: 24px;
+		padding-top: 20px;
+		border-top: 1px solid var(--color-border);
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+	.eliza-signin .eliza-reassure {
+		display: flex;
+		align-items: flex-start;
+		justify-content: center;
+		gap: 7px;
+		margin: 0;
+		font-size: 13px;
+		line-height: 1.5;
+		text-align: left;
+		color: var(--color-text-light-2);
+	}
+	.eliza-signin .eliza-reassure svg {
+		flex: 0 0 auto;
+		margin-top: 1px;
+		fill: var(--color-text-light-2);
+	}
+	.eliza-signin .eliza-trust {
+		margin: 0;
+		font-size: 12px;
+		line-height: 1.5;
+		color: var(--color-text-light-2);
+		opacity: 0.85;
+	}
+
+	/* Screen-reader-only live region for the connection status. */
+	.eliza-signin .eliza-status {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.eliza-signin *,
+		.eliza-signin *::before,
+		.eliza-signin *::after {
+			transition: none !important;
+			animation: none !important;
+		}
+		/* Static, even ring — never a broken partial circle frozen mid-spin. */
+		.eliza-signin .eliza-spinner {
+			border-color: rgba(255, 255, 255, 0.85);
+		}
+	}
+</style>
+
+<div class="eliza-signin">
+	<img class="eliza-logo" src="{{AssetUrlPrefix}}/img/logo.svg" alt="" width="44" height="44">
+
+	{{if .LinkAccountMode}}
+		<p class="eliza-eyebrow">Eliza Hub · Account linking</p>
+		<h1>Link your Eliza Cloud account</h1>
+		<p class="eliza-sub">Confirm with Eliza Cloud to connect this sign-in to your existing Hub account.</p>
+	{{else}}
+		<p class="eliza-eyebrow">Eliza Hub · Member access</p>
+		<h1>Welcome to Eliza Hub</h1>
+		<p class="eliza-sub">One Eliza Cloud account for the whole stack — Google, Discord, GitHub, wallet, passkey, or email.</p>
+	{{end}}
+
+	{{if .OAuth2Providers}}
+		{{range $provider := .OAuth2Providers}}
+			<a class="{{$provider.Name}} eliza-btn oauth-login-link" href="{{AppSubUrl}}/user/oauth2/{{$provider.DisplayName}}" rel="nofollow">
+				<span class="eliza-btn__face">
+					<span class="eliza-btn__label">Continue with Eliza Cloud</span>
+					{{svg "octicon-arrow-right" 18}}
+				</span>
+				<span class="eliza-btn__connect" aria-hidden="true">
+					<span class="eliza-spinner"></span>
+					<span>Connecting to Eliza Cloud…</span>
+				</span>
+			</a>
+		{{end}}
+	{{else}}
+		<p class="eliza-sub" role="alert">Sign-in is temporarily unavailable — no identity provider is configured. Please contact a Hub administrator.</p>
+	{{end}}
+
+	<p class="eliza-note" aria-hidden="true">Taking longer than usual — try again.</p>
+
+	{{if not .LinkAccountMode}}
+		<div class="eliza-foot">
+			<p class="eliza-reassure">
+				{{svg "octicon-shield-check" 16}}
+				<span>New here? Signing in creates your Hub account automatically.</span>
+			</p>
+			<p class="eliza-trust">Opens the Eliza Cloud login — the same account you use at eliza.app.</p>
+		</div>
+	{{end}}
+
+	<p class="eliza-status" role="status" aria-live="polite" aria-label="Sign-in status"></p>
+</div>
+
+<script>
+	(function () {
+		"use strict";
+		try {
+			if (!document.querySelector || !document.addEventListener) { return; }
+			var root = document.querySelector(".eliza-signin");
+			if (!root || !root.classList) { return; }
+			var status = root.querySelector(".eliza-status");
+			var links = root.querySelectorAll("a.oauth-login-link");
+			if (!links || !links.length) { return; }
+			var timer = null;
+
+			function say(msg) { if (status) { status.textContent = msg; } }
+
+			// Restore a clean, clickable button — used by the stall fallback and by
+			// the bfcache pageshow handler when a back/forward restore returns us here.
+			function reset() {
+				if (timer) { window.clearTimeout(timer); timer = null; }
+				root.classList.remove("is-connecting");
+				root.classList.remove("is-stalled");
+				for (var j = 0; j < links.length; j++) {
+					links[j].classList.remove("is-connecting");
+					links[j].removeAttribute("aria-disabled");
+					links[j].removeAttribute("aria-busy");
+					links[j].removeAttribute("data-connecting");
+				}
+				say("");
+			}
+
+			function connect(link) {
+				// Guard against double-fire; the navigation itself is never cancelled.
+				if (link.getAttribute("data-connecting") === "true") { return; }
+				root.classList.add("is-connecting");
+				root.classList.remove("is-stalled");
+				link.classList.add("is-connecting");
+				link.setAttribute("data-connecting", "true");
+				link.setAttribute("aria-busy", "true");
+				link.setAttribute("aria-disabled", "true");
+				say("Connecting to Eliza Cloud");
+
+				// Safety net: if the redirect stalls and our page is still here,
+				// restore the button and invite a retry.
+				timer = window.setTimeout(function () {
+					if (link.getAttribute("data-connecting") !== "true") { return; }
+					reset();
+					root.classList.add("is-stalled");
+					say("Taking longer than usual — try again");
+				}, 12000);
+			}
+
+			function onClick(e) {
+				// Let modified clicks (new tab/window) and non-primary buttons pass
+				// through untouched — our page stays put in those cases.
+				if (e.defaultPrevented) { return; }
+				if (typeof e.button === "number" && e.button !== 0) { return; }
+				if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) { return; }
+				connect(this);
+			}
+
+			for (var i = 0; i < links.length; i++) {
+				links[i].addEventListener("click", onClick, false);
+			}
+
+			// bfcache: a back/forward restore can return this page with the button
+			// frozen mid-connect. Strip the connecting state so it is usable again.
+			window.addEventListener("pageshow", function (ev) {
+				if (ev && ev.persisted) { reset(); }
+			}, false);
+		} catch (err) {
+			// Never let a scripting error block the real sign-in link.
+		}
+	})();
+</script>
