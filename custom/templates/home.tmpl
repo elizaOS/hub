@@ -327,13 +327,26 @@
 		   The local development preview is only consulted when this page is
 		   itself being served from localhost. A public instance must never
 		   probe its visitors' own machines for a dev server. */
-		var SOURCES = ["https://eliza.army/data/leaderboard.json"];
+		/* git.army is the program's forward-canonical origin (the GitArmy
+		   rebuild); eliza.army is kept as a fallback while git.army DNS and
+		   the deploy settle. The chain below tries each source in order and
+		   falls through on failure, so an unresolved git.army costs one fast
+		   failed fetch, never a broken panel. */
+		var SOURCES = [
+			"https://git.army/data/leaderboard.json",
+			"https://eliza.army/data/leaderboard.json"
+		];
 		if (/^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname)) {
 			SOURCES.push("http://localhost:4466/data/leaderboard.json");
 		}
 		function validSnapshot(d) {
+			/* schemaVersion is a floor, not an exact match: the GitArmy feed
+			   bumped 2 -> 4 without changing any field the hub reads, and every
+			   field is validated explicitly below, so accept any version >= 2
+			   and let the shape checks reject anything actually incompatible. */
 			return d && typeof d === "object" &&
-				d.schemaVersion === "2" &&
+				typeof d.schemaVersion !== "undefined" &&
+				Number(d.schemaVersion) >= 2 &&
 				Array.isArray(d.leaders) &&
 				Array.isArray(d.repositories) &&
 				d.workQueue && typeof d.workQueue === "object" &&
