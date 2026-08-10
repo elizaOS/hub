@@ -101,6 +101,13 @@ An operated Eliza Hub instance starts by hosting two repositories:
   repository in the program, hosted on the hub as `elizaOS/arklib` so both
   program repositories live under one organization.
 
+Both are hosted as **read-only pull mirrors of GitHub**, which remains their
+write-master: issues, pull requests, CI, releases, and stars stay on GitHub,
+and the hub copies auto-sync on a 15-minute interval with their issue and PR
+units disabled. The invariant that makes running both surfaces safe — one
+write-master per repository, one-way mirrors, never bidirectional sync — is
+documented in [`docs/mirroring.md`](docs/mirroring.md).
+
 [Eliza Army](https://eliza.army) ([source](https://github.com/elizaOS/army)) is
 the public contribution front door: it publishes the contributor skill, the
 live work queue, and the contribution ledger for the repositories in this
