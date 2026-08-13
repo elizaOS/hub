@@ -25,7 +25,7 @@
     "worker": "node services/merge-steward/src/cli.js worker",
     "build": "bun run check",
     "check": "bun run --cwd services/merge-steward check",
-    "test": "bun run --cwd services/merge-steward test",
+    "test": "bun run --cwd services/merge-steward test && node --test scripts/*.test.mjs",
     "validate:privacy": "./scripts/private-reference-scan.sh",
     "validate:infra": "./deployment/hetzner-staging/scripts/validate-infrastructure.sh",
     "validate": "bun run build && bun run test && bun run validate:privacy && bun run validate:infra"

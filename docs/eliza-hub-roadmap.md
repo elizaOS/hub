@@ -6,7 +6,9 @@ remain private operator material and must never be committed.
 
 ## Product Name Direction
 
-Use **Eliza Hub** as the product name for now.
+Use **Slop Git** for the operated public forge and **Eliza Hub** for the
+reusable distribution and broader coordination layer. The canonical naming and
+domain contract lives in [`product-naming.md`](product-naming.md).
 
 Rationale:
 
@@ -19,9 +21,8 @@ Rationale:
 
 Surface names:
 
-- **Eliza Hub**: the whole product experience.
-- **Eliza Git**: the Forgejo-backed repo, issue, PR, Actions, package, and wiki
-  surface.
+- **Slop Git**: the public Forgejo-backed repo and discovery surface for Slop.
+- **Eliza Hub**: the reusable distribution and coordination shell.
 - **Eliza Work**: Eliza-native work items, cycles, modules, views, pages,
   intake, docs, and dashboards.
 - **Merge Steward**: the internal service that owns policy, queueing, audited

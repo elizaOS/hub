@@ -1,3 +1,15 @@
-{{/* Pre-</body> hook. Eliza Hub footer styling lives in
+{{/* Pre-</body> hook. Slop Git footer styling lives in
      public/assets/css/theme-eliza.css; footer links are added in
-     extra_links_footer.tmpl. */}}
+     extra_links_footer.tmpl. Forgejo 15 assigns the menu role to the language
+     trigger and no role to its menu; correct that upstream inversion after its
+     client initializer runs so assistive technology receives a valid tree. */}}
+<script>
+	window.addEventListener("load", function () {
+		var trigger = document.querySelector(".page-footer .ui.dropdown.language");
+		var menu = trigger && trigger.querySelector(".menu");
+		if (!trigger || !menu) { return; }
+		trigger.setAttribute("role", "button");
+		trigger.setAttribute("aria-haspopup", "menu");
+		menu.setAttribute("role", "menu");
+	});
+</script>

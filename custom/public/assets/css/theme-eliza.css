@@ -1,5 +1,5 @@
 /*
- * Eliza Hub dark theme.
+ * Slop Git dark theme.
  *
  * Uses Forgejo's bundled dark theme as the base, then applies the real Eliza
  * brand colors and app surface tokens from the local elizaOS checkout.
@@ -199,7 +199,7 @@ html[data-theme="eliza"] #navbar-logo {
 }
 
 html[data-theme="eliza"] #navbar-logo::after {
-  content: "Eliza Hub";
+  content: "Slop Git";
   color: #ffffff;
   font-size: 14px;
   font-weight: 700;
@@ -575,7 +575,7 @@ html[data-theme="eliza"] .page-footer a:hover {
 
 html[data-theme="eliza"] .page-footer .left-links::before {
   color: var(--eliza-orange);
-  content: "Eliza Hub";
+  content: "Slop Git";
   font-weight: 700;
   margin-right: 12px;
 }
@@ -586,7 +586,7 @@ html[data-theme="eliza"] .page-footer .left-links::before {
   }
 
   html[data-theme="eliza"] #navbar-logo::after {
-    content: "Eliza";
+    content: "Slop Git";
     font-size: 13px;
   }
 

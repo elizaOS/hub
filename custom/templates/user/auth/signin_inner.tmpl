@@ -1,6 +1,6 @@
 {{/*
-	Eliza Hub — templates/user/auth/signin_inner.tmpl (drop-in replacement)
-	Deployed at custom/templates/user/auth/signin_inner.tmpl on git.eliza.army
+	Slop Git — templates/user/auth/signin_inner.tmpl (drop-in replacement)
+	Deployed at custom/templates/user/auth/signin_inner.tmpl on git.slop.cash
 	Refined-minimal SSO gateway. Internal username/password sign-in is retired here:
 	the single Eliza Cloud provider button is the hero. All CSS is scoped under
 	.eliza-signin so nothing leaks. No external resources (CSP-safe). The href and
@@ -197,12 +197,12 @@
 	<img class="eliza-logo" src="{{AssetUrlPrefix}}/img/logo.svg" alt="" width="44" height="44">
 
 	{{if .LinkAccountMode}}
-		<p class="eliza-eyebrow">Eliza Hub · Account linking</p>
+		<p class="eliza-eyebrow">Slop Git · Account linking</p>
 		<h1>Link your Eliza Cloud account</h1>
-		<p class="eliza-sub">Confirm with Eliza Cloud to connect this sign-in to your existing Hub account.</p>
+		<p class="eliza-sub">Confirm with Eliza Cloud to connect this sign-in to your existing Slop Git account.</p>
 	{{else}}
-		<p class="eliza-eyebrow">Eliza Hub · Member access</p>
-		<h1>Welcome to Eliza Hub</h1>
+		<p class="eliza-eyebrow">Slop Git · Member access</p>
+		<h1>Welcome to Slop Git</h1>
 		<p class="eliza-sub">One Eliza Cloud account for the whole stack — Google, Discord, GitHub, wallet, passkey, or email.</p>
 	{{end}}
 

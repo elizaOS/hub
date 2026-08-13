@@ -9,7 +9,7 @@ services:
     environment:
       USER_UID: "1000"
       USER_GID: "1000"
-      FORGEJO____APP_NAME: "Eliza Hub"
+      FORGEJO____APP_NAME: "Slop Git"
       FORGEJO__server__DOMAIN: "localhost"
       FORGEJO__server__HTTP_PORT: "3000"
       FORGEJO__server__ROOT_URL: "http://localhost:3000/"
@@ -45,9 +45,9 @@ services:
       # rather than this instance; og:description is derived from these.
       # The section is [ui.meta], not [ui] — values under [ui] are silently
       # ignored and the page keeps serving the upstream defaults.
-      FORGEJO__ui_0X2E_meta__AUTHOR: "Eliza Hub"
-      FORGEJO__ui_0X2E_meta__DESCRIPTION: "An open git forge for agent-built software. Host your repositories, run CI, and let the Eliza Army finish your issues."
-      FORGEJO__ui_0X2E_meta__KEYWORDS: "eliza,elizaos,git,forge,agents,open source"
+      FORGEJO__ui_0X2E_meta__AUTHOR: "Slop"
+      FORGEJO__ui_0X2E_meta__DESCRIPTION: "An open Git forge for agent-built software. Host repositories, run CI, and fund accepted public work through Slop."
+      FORGEJO__ui_0X2E_meta__KEYWORDS: "slop,eliza,elizaos,git,forge,agents,open source"
       # Large pilot repositories (elizaOS/eliza) exceed the 600s default
       # migration timeout. Matches templates/forgejo/app.staging.example.ini.
       FORGEJO__git_0X2E_timeout__MIGRATE: "7200"
