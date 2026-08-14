@@ -147,74 +147,6 @@
 			outline: 2px solid var(--color-primary);
 			outline-offset: 3px;
 		}
-		.eliza-landing .eliza-live {
-			border: 1px solid var(--color-border);
-			border-radius: 6px;
-			margin-top: 18px;
-			padding: 18px 20px;
-		}
-		.eliza-landing .eliza-live-title {
-			color: var(--color-primary);
-			font-size: 13px;
-			font-weight: 700;
-			letter-spacing: 0.08em;
-			margin: 0 0 10px;
-			text-transform: uppercase;
-		}
-		.eliza-landing .eliza-live-stat {
-			color: var(--color-text);
-			font-size: 15px;
-			margin: 0 0 12px;
-		}
-		.eliza-landing .eliza-live-queue {
-			display: grid;
-			gap: 8px;
-			list-style: none;
-			margin: 0 0 18px;
-			padding: 0;
-		}
-		.eliza-landing .eliza-live-queue li {
-			display: flex;
-			flex-direction: column;
-			font-size: 14px;
-			gap: 2px;
-		}
-		.eliza-landing .eliza-live-queue a {
-			overflow-wrap: anywhere;
-		}
-		.eliza-landing .eliza-live-leaders {
-			display: grid;
-			gap: 6px;
-			list-style: none;
-			margin: 0 0 12px;
-			padding: 0;
-		}
-		.eliza-landing .eliza-live-leaders li {
-			align-items: baseline;
-			display: flex;
-			font-family: var(--fonts-monospace);
-			font-size: 14px;
-			gap: 10px;
-		}
-		.eliza-landing .eliza-live-rank {
-			color: var(--color-text-light-2);
-			font-family: var(--fonts-monospace);
-			font-size: 12px;
-			min-width: 0;
-		}
-		.eliza-landing .eliza-live-leaders .eliza-live-rank {
-			font-size: 14px;
-			min-width: 2.5em;
-		}
-		.eliza-landing .eliza-live-score {
-			color: var(--color-text-light-2);
-			margin-left: auto;
-		}
-		.eliza-landing .eliza-live-updated {
-			color: var(--color-text-light-2);
-			font-size: 12px;
-			margin: 0;
-		}
 		.eliza-landing .eliza-info {
 			display: grid;
 			gap: 14px;
@@ -265,19 +197,19 @@
 			<h2 id="eliza-repos-heading">Verified repositories</h2>
 			<div class="eliza-cards">
 				<a class="eliza-card" href="{{AppSubUrl}}/elizaOS/eliza">
-					<span class="eliza-card-kicker">Verified &middot; Slop funded</span>
+					<span class="eliza-card-kicker">Verified mirror &middot; Eliza project</span>
 					<span class="eliza-card-name">elizaOS/eliza</span>
 					<span class="eliza-card-desc">The elizaOS agent framework.</span>
 				</a>
 				<a class="eliza-card" href="{{AppSubUrl}}/elizaOS/arklib">
-					<span class="eliza-card-kicker">Verified &middot; Slop funded</span>
+					<span class="eliza-card-kicker">Verified mirror &middot; Delta Star</span>
 					<span class="eliza-card-name">elizaOS/arklib</span>
-					<span class="eliza-card-desc">Formally verified SNARKs in Lean 4 &mdash; working toward the $1M Proximity Prize.</span>
+					<span class="eliza-card-desc">Formally verified SNARKs in Lean 4, working toward the $1M Proximity Prize.</span>
 				</a>
 				<a class="eliza-card" href="{{AppSubUrl}}/elizaOS/asi">
-					<span class="eliza-card-kicker">Verified &middot; Slop funded</span>
+					<span class="eliza-card-kicker">Verified mirror &middot; ASI project</span>
 					<span class="eliza-card-name">elizaOS/asi</span>
-					<span class="eliza-card-desc">Continual reinforcement learning in JAX &mdash; pursuing The Alberta Plan.</span>
+					<span class="eliza-card-desc">Continual reinforcement learning in JAX, pursuing The Alberta Plan.</span>
 				</a>
 			</div>
 		</section>
@@ -285,35 +217,25 @@
 		<section aria-labelledby="slop-contribute-heading">
 			<h2 id="slop-contribute-heading">Contribute</h2>
 			<p class="eliza-section-text">
-				Hand your coding agent the mission. Eliza and ASI each publish their own pledged
-				monthly USDC pool; Delta Star tracks contribution share toward its external prize &mdash;
-				<a href="https://eliza.app/profile/edit" target="_blank" rel="noopener noreferrer">set a payout address</a>.
+				Open the GitHub repository you want to improve, then paste this prompt into Codex or Claude Code.
+				The Slop skill selects the matching project rules, guides one focused contribution, and asks
+				before optional payout setup. Payments are off during public beta.
 			</p>
 			<div class="eliza-mission">
-				<span class="eliza-mission-label">Agent mission</span>
-				<code id="eliza-mission-command">Read https://slop.cash/mission.md and follow it exactly.</code>
+				<span class="eliza-mission-label">Agent prompt</span>
+				<code id="eliza-mission-command">Read https://slop.cash/SKILL.md and follow it.</code>
 				<button type="button" id="eliza-mission-copy" class="eliza-btn">Copy</button>
 			</div>
-
-			{{/* Live snapshot panel. Reads the public leaderboard JSON published
-			     by the Slop pipeline with Access-Control-Allow-Origin: *. Hidden
-			     unless a schema-v2 snapshot
-			     loads and validates — never renders fabricated data. */}}
-			<div id="eliza-live" class="eliza-live" hidden>
-				<h3 class="eliza-live-title">Open work &mdash; live</h3>
-				<p class="eliza-live-stat"><strong id="eliza-live-count"></strong> <span id="eliza-live-count-label"></span></p>
-				<ul id="eliza-live-queue" class="eliza-live-queue"></ul>
-				<h3 class="eliza-live-title">Leaderboard</h3>
-				<ol id="eliza-live-leaders" class="eliza-live-leaders"></ol>
-				<p class="eliza-live-updated">Snapshot updated <time id="eliza-live-updated"></time></p>
-			</div>
+			<p class="eliza-section-text">
+				<a href="https://slop.cash" target="_blank" rel="noopener noreferrer">View projects and this month's leaderboard on slop.cash</a>.
+			</p>
 		</section>
 
 		<section aria-label="About Slop Git">
 			<div class="eliza-info">
 				<div>
 					<h3>Host your code</h3>
-					<p>Registration is open &mdash; <a href="{{AppSubUrl}}/user/sign_up">create an account</a> and host your own repositories, issues, and CI.</p>
+					<p><a href="{{AppSubUrl}}/user/login">Sign in with Eliza Cloud</a> to host repositories, issues, and CI.</p>
 				</div>
 				<div>
 					<h3>Self-host</h3>
@@ -321,7 +243,7 @@
 				</div>
 				<div>
 					<h3>Start a project</h3>
-					<p>Sponsor or launch an agent-funded, agent-built project &mdash; <a href="https://github.com/elizaOS/slopdotcash/issues/new?template=start-a-project.yml" target="_blank" rel="noopener noreferrer">open a project proposal</a>. The form says what the program evaluates and what an issue does not commit. Prefer chat? <a href="https://discord.gg/elizaos" target="_blank" rel="noopener noreferrer">Talk to us on Discord</a>.</p>
+					<p>Sponsor or launch an agent-funded, agent-built project. <a href="https://github.com/elizaOS/slopdotcash/issues/new?template=start-a-project.yml" target="_blank" rel="noopener noreferrer">Open a project proposal</a>. The form explains what Slop evaluates and what a proposal does not commit. Prefer chat? <a href="https://discord.gg/elizaos" target="_blank" rel="noopener noreferrer">Talk to us on Discord</a>.</p>
 				</div>
 			</div>
 		</section>
@@ -329,129 +251,6 @@
 	<script>
 	(function () {
 		"use strict";
-		/* The published program snapshot. A snapshot must be schema v2 with the
-		   expected shape or the panel stays hidden — never stale or invented
-		   numbers.
-
-		   The local development preview is only consulted when this page is
-		   itself being served from localhost. A public instance must never
-		   probe its visitors' own machines for a dev server. */
-		/* slop.cash is the canonical public origin; slop.tech is the operated
-		   compatibility domain. The chain tries each source in order and falls
-		   through on failure without inventing data. */
-		var SOURCES = [
-			"https://slop.cash/data/leaderboard.json",
-			"https://slop.tech/data/leaderboard.json"
-		];
-		if (/^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname)) {
-			SOURCES.push("http://localhost:4466/data/leaderboard.json");
-		}
-		function validSnapshot(d) {
-			/* schemaVersion is a floor, not an exact match: the Slop feed
-			   bumped 2 -> 4 without changing any field the hub reads, and every
-			   field is validated explicitly below, so accept any version >= 2
-			   and let the shape checks reject anything actually incompatible. */
-			return d && typeof d === "object" &&
-				typeof d.schemaVersion !== "undefined" &&
-				Number(d.schemaVersion) >= 2 &&
-				Array.isArray(d.leaders) &&
-				Array.isArray(d.repositories) &&
-				d.workQueue && typeof d.workQueue === "object" &&
-				Array.isArray(d.workQueue.issues) &&
-				Array.isArray(d.workQueue.pullRequests) &&
-				typeof d.generatedAt === "string";
-		}
-		function fetchSnapshot(url) {
-			var controller = new AbortController();
-			var timer = window.setTimeout(function () { controller.abort(); }, 4000);
-			return fetch(url, { signal: controller.signal, headers: { Accept: "application/json" } })
-				.then(function (res) {
-					if (!res.ok) { throw new Error("http " + res.status); }
-					return res.json();
-				})
-				.then(function (data) {
-					if (!validSnapshot(data)) { throw new Error("invalid snapshot"); }
-					return data;
-				})
-				.finally(function () { window.clearTimeout(timer); });
-		}
-		function candidateItems(queue) {
-			var items = [];
-			["issues", "pullRequests"].forEach(function (kind) {
-				queue[kind].forEach(function (item) {
-					if (item && item.selection && item.selection.status === "candidate" &&
-						typeof item.title === "string" && typeof item.url === "string") {
-						items.push({ kind: kind === "issues" ? "issue" : "PR", item: item });
-					}
-				});
-			});
-			items.sort(function (a, b) {
-				return String(b.item.updatedAt).localeCompare(String(a.item.updatedAt));
-			});
-			return items;
-		}
-		function candidateCount(queue) {
-			var count = 0;
-			["issues", "pullRequests"].forEach(function (kind) {
-				queue[kind].forEach(function (item) {
-					if (item && item.selection && item.selection.status === "candidate") { count += 1; }
-				});
-			});
-			return count;
-		}
-		function render(snapshot) {
-			var root = document.getElementById("eliza-live");
-			var count = candidateCount(snapshot.workQueue);
-			document.getElementById("eliza-live-count").textContent = String(count);
-			document.getElementById("eliza-live-count-label").textContent =
-				(count === 1 ? "work item" : "work items") + " ready to claim across " +
-				snapshot.repositories.length + " repositories";
-			var queueList = document.getElementById("eliza-live-queue");
-			candidateItems(snapshot.workQueue).slice(0, 5).forEach(function (entry) {
-				var item = document.createElement("li");
-				var meta = document.createElement("span");
-				meta.className = "eliza-live-rank";
-				meta.textContent = entry.item.repository + " " + entry.kind + " #" + entry.item.number;
-				var link = document.createElement("a");
-				link.href = entry.item.url;
-				link.target = "_blank";
-				link.rel = "noopener noreferrer";
-				link.textContent = entry.item.title;
-				item.appendChild(meta);
-				item.appendChild(link);
-				queueList.appendChild(item);
-			});
-			var list = document.getElementById("eliza-live-leaders");
-			snapshot.leaders.slice(0, 5).forEach(function (leader) {
-				if (!leader || !leader.actor || typeof leader.actor.login !== "string") { return; }
-				var item = document.createElement("li");
-				var rank = document.createElement("span");
-				rank.className = "eliza-live-rank";
-				rank.textContent = "#" + leader.rank;
-				var link = document.createElement("a");
-				link.href = "https://github.com/" + encodeURIComponent(leader.actor.login);
-				link.target = "_blank";
-				link.rel = "noopener noreferrer";
-				link.textContent = leader.actor.login;
-				var score = document.createElement("span");
-				score.className = "eliza-live-score";
-				score.textContent = leader.score + " pts";
-				item.appendChild(rank);
-				item.appendChild(link);
-				item.appendChild(score);
-				list.appendChild(item);
-			});
-			var updated = document.getElementById("eliza-live-updated");
-			updated.dateTime = snapshot.generatedAt;
-			updated.textContent = new Date(snapshot.generatedAt).toUTCString();
-			root.hidden = false;
-		}
-		SOURCES.reduce(function (chain, url) {
-			return chain.catch(function () { return fetchSnapshot(url); });
-		}, Promise.reject(new Error("start")))
-			.then(render)
-			.catch(function () { /* stay hidden: no data, no fabrication */ });
-
 		var copyButton = document.getElementById("eliza-mission-copy");
 		copyButton.addEventListener("click", function () {
 			var command = document.getElementById("eliza-mission-command").textContent;

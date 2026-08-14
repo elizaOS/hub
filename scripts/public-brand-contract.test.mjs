@@ -43,7 +43,7 @@ describe("public Slop Git brand contract", () => {
     }
   });
 
-  it("uses Slop Git, the canonical mission, and a bounded data fallback", async () => {
+  it("uses Slop Git and the canonical one-prompt onboarding", async () => {
     const compose = await source("compose.yml");
     const home = await source("custom/templates/home.tmpl");
     const logo = await source("custom/public/assets/img/logo.svg");
@@ -55,21 +55,14 @@ describe("public Slop Git brand contract", () => {
     assert.match(home, /<h1>Slop Git<\/h1>/u);
     assert.match(logo, /aria-label="Slop"/u);
     assert.match(signIn, /<h1>Welcome to Slop Git<\/h1>/u);
-    assert.match(home, /Read https:\/\/slop\.cash\/mission\.md/u);
+    assert.match(home, /Read https:\/\/slop\.cash\/SKILL\.md/u);
     assert.match(home, /elizaOS\/asi/u);
     assert.match(home, /github\.com\/elizaOS\/slopdotcash\/issues\/new/u);
     assert.doesNotMatch(home, /\$10,000 monthly USDC pool/u);
-    const canonical = home.indexOf(
-      '"https://slop.cash/data/leaderboard.json"',
-    );
-    const fallback = home.indexOf(
-      '"https://slop.tech/data/leaderboard.json"',
-    );
-    assert.ok(canonical >= 0, "canonical Slop snapshot source is missing");
-    assert.ok(
-      fallback > canonical,
-      "slop.tech must remain a fallback after slop.cash",
-    );
+    assert.doesNotMatch(home, /slop\.cash\/mission\.md|eliza\.app\/profile/u);
+    assert.doesNotMatch(home, /ready to claim|data\/leaderboard\.json/u);
+    assert.match(home, /user\/login[^>]*>Sign in with Eliza Cloud/u);
+    assert.doesNotMatch(home, /user\/sign_up|Registration is open/u);
   });
 
   it("documents the public and reusable product layers separately", async () => {

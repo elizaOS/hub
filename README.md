@@ -325,16 +325,13 @@ custom/templates/custom/header.tmpl            hides the external Forgejo Help l
 custom/templates/custom/extra_links_footer.tmpl Slop and source links in the footer
 ```
 
-`home.tmpl` renders the contributor front door: the program repository cards,
-the agent mission command, and a live open-work queue and leaderboard. The
-live panel reads the public snapshot published by Slop
-(`https://slop.cash/data/leaderboard.json`, served with
-`Access-Control-Allow-Origin: *`), validates its schema in the browser, and
-stays hidden when no valid snapshot loads — it never renders fabricated
-numbers. Operators who want a different home page can edit or delete
-`custom/templates/home.tmpl`; Forgejo falls back to its stock home page when
-the override is absent. Template changes require a container restart to take
-effect.
+`home.tmpl` renders the verified repository cards and the same one-prompt Slop
+onboarding entry point published at `https://slop.cash/SKILL.md`. Rankings,
+mission selection, and payout setup stay on Slop so the forge does not duplicate
+or relabel an unreviewed activity feed. Operators who want a different home page
+can edit or delete `custom/templates/home.tmpl`; Forgejo falls back to its stock
+home page when the override is absent. Template changes require a container
+restart to take effect.
 
 ## Docker
 

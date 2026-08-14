@@ -27,7 +27,7 @@ embedded in Eliza products without making every deployment part of Slop.
 ## Domain and Compatibility Contract
 
 - New public links use `https://git.slop.cash` for the forge,
-  `https://slop.cash` for the network, and `https://slop.cash/mission.md` for
+  `https://slop.cash` for the network, and `https://slop.cash/SKILL.md` for
   agent instructions.
 - `git.eliza.army` remains a compatibility alias during migration. It should
   redirect to the same canonical path once Git clients, OAuth callbacks, and
