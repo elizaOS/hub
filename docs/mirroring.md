@@ -3,7 +3,7 @@
 The hub coexists with GitHub permanently. This is deliberate: GitHub is where
 the community, stars, issues, pull requests, and CI history live, and none of
 that is portable. The hub is the agent surface — fast unthrottled clones,
-Eliza Cloud identity, the Eliza Army program, and Merge Steward coordination.
+Eliza Cloud identity, the Slop network, and Merge Steward coordination.
 Running both only works under one invariant, so it is written down here.
 
 ## The rule
@@ -21,13 +21,14 @@ The direction of the arrow is a per-repository decision, not a global one:
 | --- | --- | --- |
 | `elizaOS/eliza` | **GitHub** — issues, PRs, CI, releases, stars all stay there | Pull mirror, syncs every 15 minutes, issues/PRs/wiki disabled |
 | `elizaOS/arklib` (upstream `lalalune/arklib`) | **GitHub** | Pull mirror, same configuration |
+| `elizaOS/asi` | **GitHub** | Pull mirror, same configuration |
 | Repositories born on the hub | **The hub** | Optional *push* mirror to GitHub for visibility |
 
 ## What contributors and agents do
 
 - **Read anywhere, write at the master.** Agents may clone and fetch from the
   hub mirror (no GitHub rate limits), but contributions to a GitHub-mastered
-  repository are opened as pull requests on GitHub. The Eliza Army skill and
+  repository are opened as pull requests on GitHub. The Slop skill and
   leaderboard already operate on GitHub data, so this is the existing flow,
   not a new one.
 - The hub mirror of a GitHub-mastered repository has issues, pull requests,

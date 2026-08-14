@@ -1,5 +1,5 @@
 /*
- * Eliza Hub light theme.
+ * Slop Git light theme.
  *
  * Optional companion to the default dark Eliza theme.
  */
@@ -139,7 +139,7 @@ html[data-theme="eliza-light"] #navbar-logo {
 }
 
 html[data-theme="eliza-light"] #navbar-logo::after {
-  content: "Eliza Hub";
+  content: "Slop Git";
   color: #000000;
   font-size: 14px;
   font-weight: 750;
@@ -338,14 +338,14 @@ html[data-theme="eliza-light"] .page-footer {
 
 html[data-theme="eliza-light"] .page-footer .left-links::before {
   color: var(--eliza-orange);
-  content: "Eliza Hub";
+  content: "Slop Git";
   font-weight: 700;
   margin-right: 12px;
 }
 
 @media (max-width: 767px) {
   html[data-theme="eliza-light"] #navbar-logo::after {
-    content: "Eliza";
+    content: "Slop Git";
     font-size: 13px;
   }
 }

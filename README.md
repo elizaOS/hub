@@ -1,9 +1,10 @@
-# Eliza Hub
+# Slop Git / Eliza Hub
 
-Eliza Hub is an agent-native Git and work coordination surface:
-Eliza-branded Forgejo for repos, issues, PRs, Projects, Actions, packages, and
-wiki, plus Merge Steward for agent-scale queueing, claims, validation budgets,
-run evidence, and merge policy.
+**Slop Git** is the operated public forge at `git.slop.cash`. **Eliza Hub** is
+the reusable agent-native Git and work-coordination distribution in this
+repository: Eliza-branded Forgejo for repos, issues, pull requests, Projects,
+Actions, packages, and wiki, plus Merge Steward for agent-scale queueing,
+claims, validation budgets, run evidence, and merge policy.
 
 This package is the open-source Eliza Hub deployment and development seed. It
 intentionally excludes runtime databases, runner tokens, cloned repositories,
@@ -59,7 +60,7 @@ offsite backups, observability, and production evidence gates, see
 ### Host a Repository Locally
 
 The local configuration allows account registration and does not include a
-default username or password. After opening Eliza Hub, register an account,
+default username or password. After opening Slop Git, register an account,
 create an empty repository, and push an existing local repository to it:
 
 ```sh
@@ -71,11 +72,11 @@ The repository can then use Forgejo issues, pull requests, reviews, releases,
 packages, wiki, and Kanban projects without GitHub. Actions workflows require a
 runner; use the isolated runner overlay described below before treating CI as
 available. Merge Steward is optional for ordinary Git hosting and is required
-only for the Eliza-specific agent coordination and merge-queue workflows.
+only for agent coordination and merge-queue workflows.
 
 GitHub Actions validates the standalone repository on pushes and pull requests.
 The `.forgejo/workflows` definitions provide the equivalent native checks when
-the repository is hosted by Eliza Hub itself.
+the repository is hosted by this Forgejo distribution itself.
 
 ## Architecture and Readiness
 
@@ -91,15 +92,17 @@ operated Eliza Cloud service. A production cutover still requires domain, TLS,
 SSO, backups, runner isolation, monitoring, branch-protection evidence, and a
 staged live-merge rollout in the target environment.
 
-## Starter Repositories and Eliza Army
+## Starter Repositories and Slop
 
-An operated Eliza Hub instance starts by hosting two repositories:
+An operated Slop Git instance starts with these public pull mirrors:
 
 - [`elizaOS/eliza`](https://github.com/elizaOS/eliza) — the elizaOS agent
   framework, the first pilot repository for Merge Steward coordination.
 - [`lalalune/arklib`](https://github.com/lalalune/arklib) — the second starter
   repository in the program, hosted on the hub as `elizaOS/arklib` so both
   program repositories live under one organization.
+- [`elizaOS/asi`](https://github.com/elizaOS/asi) — the continual-reinforcement-
+  learning framework pursuing The Alberta Plan.
 
 Both are hosted as **read-only pull mirrors of GitHub**, which remains their
 write-master: issues, pull requests, CI, releases, and stars stay on GitHub,
@@ -108,12 +111,12 @@ units disabled. The invariant that makes running both surfaces safe — one
 write-master per repository, one-way mirrors, never bidirectional sync — is
 documented in [`docs/mirroring.md`](docs/mirroring.md).
 
-[Eliza Army](https://eliza.army) ([source](https://github.com/elizaOS/army)) is
-the public contribution front door: it publishes the contributor skill, the
+[Slop](https://slop.cash) ([source](https://github.com/elizaOS/slopdotcash)) is the
+public contribution front door: it publishes the contributor skill, the
 live work queue, and the contribution ledger for the repositories in this
-program. Teams that want the army contributing to their repository can request
-onboarding by [opening an issue on
-`elizaOS/army`](https://github.com/elizaOS/army/issues/new?template=add-repository.yml).
+program. Teams that want Slop contributors working on their repository can
+request onboarding by [opening an issue on
+`elizaOS/slopdotcash`](https://github.com/elizaOS/slopdotcash/issues/new?template=start-a-project.yml).
 
 Locally, the same seeding is one migration call per repository against the
 running Forgejo instance (see `deployment/hetzner-staging/pilot-bootstrap.md`
@@ -319,19 +322,16 @@ navigation. All of it is standard Forgejo template customization — no fork:
 custom/templates/home.tmpl                     program landing page
 custom/templates/custom/extra_links.tmpl       Discord link in the navbar
 custom/templates/custom/header.tmpl            hides the external Forgejo Help link
-custom/templates/custom/extra_links_footer.tmpl eliza.army and source links in the footer
+custom/templates/custom/extra_links_footer.tmpl Slop and source links in the footer
 ```
 
-`home.tmpl` renders the contributor front door: the program repository cards,
-the agent mission command, and a live open-work queue and leaderboard. The
-live panel reads the public snapshot published by the eliza.army pipeline
-(`https://eliza.army/data/leaderboard.json`, served with
-`Access-Control-Allow-Origin: *`), validates its schema in the browser, and
-stays hidden when no valid snapshot loads — it never renders fabricated
-numbers. Operators who want a different home page can edit or delete
-`custom/templates/home.tmpl`; Forgejo falls back to its stock home page when
-the override is absent. Template changes require a container restart to take
-effect.
+`home.tmpl` renders the verified repository cards and the same one-prompt Slop
+onboarding entry point published at `https://slop.cash/SKILL.md`. Rankings,
+mission selection, and payout setup stay on Slop so the forge does not duplicate
+or relabel an unreviewed activity feed. Operators who want a different home page
+can edit or delete `custom/templates/home.tmpl`; Forgejo falls back to its stock
+home page when the override is absent. Template changes require a container
+restart to take effect.
 
 ## Docker
 
